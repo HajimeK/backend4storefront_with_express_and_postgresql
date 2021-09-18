@@ -32,6 +32,9 @@ services:
         depends_on:
             - postgres
         restart: always
+        networks:
+            - backend
+            - frontend
 
 
     api:
@@ -44,6 +47,7 @@ services:
             - postgre
         networks:
             - backend
+            - frontend
 
     front:
         build: ./front
