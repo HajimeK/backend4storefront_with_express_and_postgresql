@@ -2,22 +2,18 @@ version: '3.9'
 
 services:
     postgres:
-        image: postgres: latest
+        image: postgres:latest
         ports:
             - '5432:5432'
-    env_file:
-        - .env
-    environment:
-        POSTGRES_USER: root
-        POSTGRES_PASSWORD: root
-        POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
-    volumes:
-        - 'postgres:/var/lib/postgresql/data'
-    networks:
-        - backend
-    hostname: postgres
-    restart: always
-    user: root
+        env_file:
+            - .env
+        volumes:
+            - 'postgres:/var/lib/postgresql/data'
+        networks:
+            - backend
+        hostname: postgres
+        restart: always
+        user: root
 
     pgadmin4:
         image: dpage/pgadmin4
@@ -25,10 +21,9 @@ services:
         ports:
             - 3001:80
         volumes:
-            - ./pgadmin:/var/lib/pgadmin/storage
-        environment:
-            PGADMIN_DEFAULT_EMAIL: root
-            PGADMIN_DEFAULT_PASSWORD: root
+            - pgadmin:/var/lib/pgadmin4/storage
+        env_file:
+            - .env
         depends_on:
             - postgres
         restart: always
@@ -44,21 +39,9 @@ services:
         ports:
             - 3000:3000
         depends_on:
-            - postgre
+            - postgres
         networks:
             - backend
-            - frontend
-
-    front:
-        build: ./front
-        container_name: front
-        ports:
-            - 80:80
-        environment:
-            MONGO: mongo
-        depends_on:
-            - api
-        networks:
             - frontend
 
 volumes:
@@ -73,7 +56,7 @@ networks:
             config:
                 - subnet: 192.168.10.0/24
     backend:
-        driver: backend-driver
+        driver: bridge
         ipam:
             driver: default
             config:
