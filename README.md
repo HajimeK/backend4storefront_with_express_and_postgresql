@@ -2,7 +2,44 @@
 
 ## About this project
 
+
+- [About](#about)
+  - [About this project](#about-this-project)
+  - [Design](#design)
+    - [API Endpoints](#api-endpoints)
+      - [Products](#products)
+        - [Index](#index)
+          - [API](#api)
+          - [DB query](#db-query)
+          - [Improvements](#improvements)
+        - [Show](#show)
+        - [Create [token required]](#create-token-required)
+        - [categories](#categories)
+          - [API](#api-1)
+          - [DB query](#db-query-1)
+      - [Users](#users)
+        - [Index [token required]](#index-token-required)
+        - [Show [token required]](#show-token-required)
+        - [Create N[token required]](#create-ntoken-required)
+      - [Orders](#orders)
+        - [Current Order by user (args: user id)[token required]](#current-order-by-user-args-user-idtoken-required)
+        - [[OPTIONAL] Completed Orders by user (args: user id)[token required]](#optional-completed-orders-by-user-args-user-idtoken-required)
+  - [Database](#database)
+  - [Data Shapes](#data-shapes)
+      - [Product](#product)
+      - [User](#user)
+      - [Orders](#orders-1)
+      - [Product Catetory](#product-catetory)
+      - [Order Status](#order-status)
+    - [Back-end to implement with SQL in Azure](#back-end-to-implement-with-sql-in-azure)
+      - [SKills](#skills)
+        - [Query](#query)
+  - [How to launch the application](#how-to-launch-the-application)
+    - [pre-requisite](#pre-requisite)
+    - [Launch](#launch)
+
 ## Design
+
 
 ### API Endpoints
 
@@ -97,6 +134,15 @@ FROM product_category;
 
 ##### [OPTIONAL] Completed Orders by user (args: user id)[token required]
 
+
+## Database
+
+```
+open psql: psql postgres
+create a new database: create database backend4storefront
+connect to a database: \c backend4storefront
+get out of psql: \q
+```
 
 ## Data Shapes
 
@@ -198,3 +244,26 @@ FROM Skill
 LEFT JOIN Skill_Project ON Skill.id = Skill_Project.skill_id
 LEFT JOIN Project ON Skill_Project.project_id = Project.id
 ```
+
+
+## How to launch the application
+
+### pre-requisite
+
+You need Docker and Docker-Composer to launch the application.
+
+### Launch
+
+Execute the following command to launch the application.
+
+```
+docker-composer up -d
+```
+
+**CAUTION**
+
+All the environment file for the container is configured in *.env* including the password.
+This appliacation in the repository is provided as experimental purpose,
+and the passowrds are also included in the *.env* file.
+When you develop application which provides the service opent to the internet,
+do not forget to *.env* to add to *.gitignore* so that the user IDs and passords are not open in the *git* repository.
