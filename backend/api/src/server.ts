@@ -1,10 +1,10 @@
-import express, { Request, Response } from 'express'
+import express, { Request, Response } from 'express';
 import morgan from 'morgan'; // log output
 import helmet from 'helmet'; // secure header
 import cors from 'cors'; // Cross-Origine
 import rateLimit from 'express-rate-limit';
 
-const app: express.Application = express()
+export const app: express.Application = express()
 const address: string = "0.0.0.0:3000"
 
 app.use(morgan("common"));

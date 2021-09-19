@@ -4,10 +4,15 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "start": "node src/server.ts",
+    "build": "npx tsc",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint ./src/**/*.ts",
+    "jasmine": "jasmine --config=spec/jasmine.json",
+    "test": "npm run build & npm run jasmine",
+    "dev": "nodemon src/server.ts",
+    "run": "node dist/server.js",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess 'node ./dist/server.js'",
-    "test": "jasmine-ts",
-    "tsc": "tsc"
+    "test2": "jasmine-ts"
   },
   "author": "Udacity",
   "license": "ISC",
