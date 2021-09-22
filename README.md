@@ -7,6 +7,8 @@
   - [How to launch the application](#how-to-launch-the-application)
     - [pre-requisite](#pre-requisite)
     - [Launch](#launch)
+  - [Test the application](#test-the-application)
+    - [Set up](#set-up)
   - [Design](#design)
   - [Database](#database)
     - [Initialize PostgreSQL](#initialize-postgresql)
@@ -85,6 +87,19 @@ This appliacation in the repository is provided as experimental purpose,
 and the passowrds are also included in the *.env* file.
 When you develop application which provides the service opent to the internet,
 do not forget to *.env* to add to *.gitignore* so that the user IDs and passords are not open in the *git* repository.
+
+## Test the application
+
+### Set up
+
+```
+cd api/backend
+npm i -g db-migrate
+sudo npm i -g db-migrate
+npm i db-migrate db-migrate-pg
+db-migrate create backend4storefront --sql-file
+```
+
 
 ## Design
 
