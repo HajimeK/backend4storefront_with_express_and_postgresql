@@ -33,22 +33,9 @@ services:
             - backend
             - frontend
 
-
-    api:
-        build: ./backend
-        container_name: backend
-        restart: always
-        ports:
-            - 3000:3000
-        depends_on:
-            - postgres
-        networks:
-            - backend
-            - frontend
-
 volumes:
-  postgres:
-  pgadmin:
+    postgres:
+    pgadmin:
 
 networks:
     frontend:
