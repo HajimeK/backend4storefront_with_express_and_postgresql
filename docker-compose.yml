@@ -35,8 +35,8 @@ services:
             - frontend
 
 volumes:
-  postgres:
-  pgadmin:
+    postgres:
+    pgadmin:
 
 networks:
     frontend:

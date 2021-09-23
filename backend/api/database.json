@@ -10,7 +10,7 @@
         "driver": "pg",
         "host": "127.0.0.1",
         "database": "backend4storefront_test",
-        "user": "test_root",
-        "password": "password123"
+        "user": "pg_root",
+        "password": "P@ssw0rd123"
     }
 }
