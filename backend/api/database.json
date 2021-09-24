@@ -3,14 +3,14 @@
         "driver": "pg",
         "host": "127.0.0.1",
         "database": "backend4storefront_dev",
-        "user": "pg_root",
+        "user": "root",
         "password": "P@ssw0rd1234"
     },
     "test": {
         "driver": "pg",
         "host": "127.0.0.1",
         "database": "backend4storefront_test",
-        "user": "pg_root",
+        "user": "root",
         "password": "P@ssw0rd123"
     }
 }
