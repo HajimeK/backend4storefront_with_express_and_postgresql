@@ -137,8 +137,9 @@ CREATE DATABASE backend4storefront;
 
 ``` sql
 CREATE TABLE IF NOT EXISTS product_category (
-  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  id SERIAL,
   category VARCHAR(32) NOT NULL,
+  PRIMARY KEY (id)
 );
 ```
 
@@ -181,8 +182,9 @@ FROM product_category
 
 ``` sql
 CREATE TABLE IF NOT EXISTS order_status (
-  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  id SERIAL,
   order_status VARCHAR(32) NOT NULL,
+  PRIMARY KEY (id)
 );
 ```
 
@@ -216,13 +218,14 @@ INSERT INTO order_status VALUES
 
 ``` sql
 CREATE TABLE IF NOT EXISTS product (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    product_name VARCHAR(128) NOT NULL,
-    price INT NOT NULL,
-    CONSTRAINT fk_category_id
+  id SERIAL,
+  product_name VARCHAR(128) NOT NULL,
+  price INT NOT NULL,
+  CONSTRAINT fk_category_id
     FOREIGN KEY (category_id) 
     REFERENCES product_category (id)
     ON DELETE RESTRICT ON UPDATE RESTRICT,
+  PRIMARY KEY (id)
 );
 ```
 
@@ -347,10 +350,11 @@ LEFT JOIN product_category ON product.category_id = product_category.id;
 
 ``` sql
 CREATE TABLE IF NOT EXISTS user (
-  id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  id SERIAL,
   firstName BYTES NOT NULL,
   lastName BYTES NOT NULL,
   password BYTES NOT NULL,
+  PRIMARY KEY (id)
 );
 ```
 
@@ -438,7 +442,7 @@ INSERT INTO user VALUES
 
 ``` sql
 CREATE TABLE IF NOT EXISTS order (
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    id SERIAL,
     CONSTRAINT fk_product_id
         FOREIGN KEY (product_id) 
         REFERENCES product (id)
@@ -452,6 +456,7 @@ CREATE TABLE IF NOT EXISTS order (
         FOREIGN KEY (order_status_id) 
         REFERENCES order_status (id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
+    PRIMARY KEY (id)
 );
 ```
 
