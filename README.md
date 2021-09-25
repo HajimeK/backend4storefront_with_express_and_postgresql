@@ -130,7 +130,7 @@ CREATE DATABASE backend4storefront;
 
 ##### Data Shapes
 
-```
+``` ts
 export type Category = {
      id: number;
      category: string;
@@ -181,7 +181,7 @@ FROM product_category
 
 ##### Data Shapes
 
-```
+``` ts
 export type OrderStatus = {
     id: number;
     status: string;
@@ -219,12 +219,14 @@ INSERT INTO order_status VALUES
 
 ##### Fields
 
-export type ProductItem = {
+``` ts
+export type Product = {
     id: number,
     name: string,
     price: number,
     category?: string
 };
+```
 
 ##### Create table
 
@@ -353,10 +355,20 @@ LEFT JOIN product_category ON product.category_id = product_category.id;
 
 ##### Fields
 
-- id
-- firstName
-- lastName
-- password
+``` ts
+export type OrderItem = {
+    id: number,
+    product_id: number,
+    quantity: number,
+};
+
+export type Order = {
+    id: number,
+    user_id: number,
+    order_status_id: number,
+    item: OrderItem[]
+}
+```
 
 ##### Create table
 
@@ -456,11 +468,6 @@ INSERT INTO user VALUES
 ``` sql
 CREATE TABLE IF NOT EXISTS order (
     id SERIAL,
-    CONSTRAINT fk_product_id
-        FOREIGN KEY (product_id)
-        REFERENCES product (id)
-        ON DELETE RESTRICT ON UPDATE RESTRICT,
-    quantity INT,
     CONSTRAINT fk_user_id
         FOREIGN KEY (user_id)
         REFERENCES user (id)
@@ -471,18 +478,25 @@ CREATE TABLE IF NOT EXISTS order (
         ON DELETE RESTRICT ON UPDATE RESTRICT,
     PRIMARY KEY (id)
 );
+
+CREATE TABLE IF NOT EXISTS order_item (
+    id SERIAL,
+    CONSTRAINT fk_order_id
+        FOREIGN KEY (order_id)
+        REFERENCES order (id)
+        ON DELETE RESTRICT ON UPDATE RESTRICT,
+    CONSTRAINT fk_product_id
+        FOREIGN KEY (product_id)
+        REFERENCES product (id)
+        ON DELETE RESTRICT ON UPDATE RESTRICT,
+    quantity INT,
+    PRIMARY KEY (id)
+)
 ```
 
 ##### Initial data for testing
 
 ``` sql
-INSERT INTO product VALUES
-  (0, 10, 0, 0),
-  (5, 10, 0, 0),
-  (8, 10, 0, 0),
-  (0, 10, 0, 1),
-  (5, 10, 0, 1),
-  (8, 10, 0, 1);
 ```
 
 #### API Endoints

@@ -1,13 +1,13 @@
 import client from '../database';
 
-export type ProductItem = {
+export type Product = {
     id: number,
     name: string,
     price: number,
     category?: string
 };
 
-export class Product {
+export class ModelProduct {
 
     /*
     * /products?top=<true | false>&num=<number(default 5)>?category=<catetory>
@@ -22,7 +22,7 @@ export class Product {
     *              },
     *           ...]
     */
-    async index(category?: string, top?: boolean, num?: number): Promise<ProductItem[]> {
+    async index(category?: string, top?: boolean, num?: number): Promise<Product[]> {
         try {
             // Generate SQL query
             const sql1 = 'SELECT product.id, product.product_name, product.price, product_category.category \
@@ -57,7 +57,7 @@ export class Product {
 
     //- [OPTIONAL] Top 5 most popular products
 
-    async show(id: string): Promise<ProductItem> {
+    async show(id: string): Promise<Product> {
         try {
             const sql = 'SELECT * FROM product WHERE id=($1)';
             // @ts-ignore
@@ -71,33 +71,33 @@ export class Product {
         }
     }
 
-    async create(pi: ProductItem): Promise<ProductItem> {
+    async create(p: Product): Promise<Product> {
         try {
             const sql = 'INSERT INTO product (name, price, category) VALUES($1, $2, $3) RETURNING *';
             // @ts-ignore
             const conn = await Client.connect();
-            const result = await conn.query(sql, [pi.name, pi.price, pi.category]);
-            const productItem = result.rows[0];
+            const result = await conn.query(sql, [p.name, p.price, p.category]);
+            const Product = result.rows[0];
             conn.release();
 
-            return productItem;
+            return Product;
         } catch (err) {
-            throw new Error(`Could not add new book ${pi.name}. Error: ${err}`)
+            throw new Error(`Could not add new book ${p.name}. Error: ${err}`)
         }
     }
 
-    async delete(id: string): Promise<ProductItem> {
+    async delete(id: string): Promise<Product> {
         try {
             const sql = 'DELETE FROM product WHERE id=($1)';
             // @ts-ignore
             const conn = await Client.connect();
             const result = await conn.query(sql, [id]);
-            const productItem = result.rows[0];
+            const Product = result.rows[0];
             conn.release();
 
-            return productItem;
+            return Product;
         } catch (err) {
-            throw new Error(`Could not delete book ${id}. Error: ${err}`)
+            throw new Error(`Could not delete book ${id}. Error: ${err}`);
         }
     }
 };
