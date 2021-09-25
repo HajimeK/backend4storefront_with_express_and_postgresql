@@ -4,3 +4,9 @@ CREATE TABLE IF NOT EXISTS product_category (
   category VARCHAR(32) NOT NULL,
   PRIMARY KEY (id)
 );
+
+INSERT INTO product_category (category) VALUES
+  ('stock'),
+  ('ETF');
+  ('crypto');
+

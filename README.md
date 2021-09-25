@@ -115,7 +115,7 @@ db-migrate create backend4storefront --sql-file
 5. get out of psql
 
 ``` sql
-psql postgres;
+psql -H <host> -U <user> backend4storefront;
 CREATE EXTENSION PGCRYPTO;
 CREATE DATABASE backend4storefront;
 \c backend4storefront
@@ -130,10 +130,16 @@ CREATE DATABASE backend4storefront;
 
 ##### Data Shapes
 
-- id
-- category
+```
+export type Category = {
+     id: number;
+     category: string;
+}
+```
 
-##### Create Table 
+The model implementation is [here](backend/api/src/models/product_category.ts).
+
+##### Create Table
 
 ``` sql
 CREATE TABLE IF NOT EXISTS product_category (
@@ -146,7 +152,7 @@ CREATE TABLE IF NOT EXISTS product_category (
 ##### Initial data for testing
 
 ``` sql
-INSERT INTO product_category VALUES
+INSERT INTO product_category (category) VALUES
   ('stock'),
   ('ETF');
   ('crypto');
@@ -175,10 +181,14 @@ FROM product_category
 
 ##### Data Shapes
 
-- id
-- order_status (compoleted, active)
+```
+export type OrderStatus = {
+    id: number;
+    status: string;
+}
+```
 
-##### Create Table 
+##### Create Table
 
 ``` sql
 CREATE TABLE IF NOT EXISTS order_status (
@@ -209,10 +219,12 @@ INSERT INTO order_status VALUES
 
 ##### Fields
 
-- id
-- name
-- price
-- [OPTIONAL] category
+export type ProductItem = {
+    id: number,
+    name: string,
+    price: number,
+    category?: string
+};
 
 ##### Create table
 
@@ -222,7 +234,7 @@ CREATE TABLE IF NOT EXISTS product (
   product_name VARCHAR(128) NOT NULL,
   price INT NOT NULL,
   CONSTRAINT fk_category_id
-    FOREIGN KEY (category_id) 
+    FOREIGN KEY (category_id)
     REFERENCES product_category (id)
     ON DELETE RESTRICT ON UPDATE RESTRICT,
   PRIMARY KEY (id)
@@ -257,7 +269,7 @@ INSERT INTO product VALUES
 
 ``` ts
 /*
- * /products?top=<true | false>&num=<number(default 5)>category=<catetory>
+ * /products?top=<true | false>&num=<number(default 5)>?category=<catetory>
  *
  * @param {boolean} top: [Optional]true to get top. If not specified
  * @param {number} num: [Optional] Only work with top.The numbe of items to get. Default value is 5.
@@ -351,9 +363,10 @@ LEFT JOIN product_category ON product.category_id = product_category.id;
 ``` sql
 CREATE TABLE IF NOT EXISTS user (
   id SERIAL,
-  firstName BYTES NOT NULL,
-  lastName BYTES NOT NULL,
-  password BYTES NOT NULL,
+  email VARCHAR NOT NULL,
+  firstName VARCHAR,
+  lastName VARCHAR,
+  userpassword VARCHAR,
   PRIMARY KEY (id)
 );
 ```
@@ -444,16 +457,16 @@ INSERT INTO user VALUES
 CREATE TABLE IF NOT EXISTS order (
     id SERIAL,
     CONSTRAINT fk_product_id
-        FOREIGN KEY (product_id) 
+        FOREIGN KEY (product_id)
         REFERENCES product (id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
     quantity INT,
     CONSTRAINT fk_user_id
-        FOREIGN KEY (user_id) 
+        FOREIGN KEY (user_id)
         REFERENCES user (id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
     CONSTRAINT fk_order_status_id
-        FOREIGN KEY (order_status_id) 
+        FOREIGN KEY (order_status_id)
         REFERENCES order_status (id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
     PRIMARY KEY (id)
