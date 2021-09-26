@@ -1,6 +1,4 @@
-import { create } from 'domain';
 import client from '../database';
-import { OrderStatus, ModelOrderStatus } from './orderStatus';
 
 export type OrderItem = {
     id: number,
@@ -15,42 +13,23 @@ export type Order = {
     item: OrderItem[]
 }
 
-
 export class ModelOrder {
 
-    /*
-Current Order by user (args: user id)[token required]
-[OPTIONAL] Completed Orders by user (args: user id)[token required]
-    */
-    async index(user?: number, order_status?: string): Promise<Order[]> {
+    async index(): Promise<Order[]> {
         try {
             // Generate SQL query
-            const sql1 = 'SELECT product.id, product.product_name, product.price, product_category.category \
-                        FROM product';
-            let sql2_category = '';
-            const sql3 = 'LEFT JOIN product_category ON product.category_id = product_category.id;';
-            let sql4_topN = '';
-            if (typeof category !== 'undefined') {
-                sql2_category = ' WHERE product.id=${category}';
-            }
-            if(typeof top !== 'undefined') {
-                let n = 5;
-                if(typeof num !== 'undefined'){
-                    n = num;
-                }
-                sql4_topN = " LIMIT ${n}";
-                //error until filtering implemented
-                throw Error("not implemented");
-            }
+            const sql = 'SELECT * FROM order \
+                            LEFT OUTER JOIN order_item \
+                            ON order.id = order_item.order';
 
             // request to DB
             const conn = await client.connect();
-            const result = await conn.query(sql1 + sql2_category + sql3 + sql4_topN);
+            const result = await conn.query(sql);
             conn.release();
 
             return result.rows;
         } catch (err) {
-            throw new Error(`Could not get books. Error: ${err}`);
+            throw new Error(`Could not get orders. Error: ${err}`);
         }
     }
 
@@ -64,7 +43,7 @@ Current Order by user (args: user id)[token required]
 
             return result.rows[0];
         } catch (err) {
-            throw new Error(`Could not find product ${id}. Error: ${err}`);
+            throw new Error(`Could not find order ${id}. Error: ${err}`);
         }
     }
 
@@ -76,43 +55,54 @@ Current Order by user (args: user id)[token required]
             await client.query("BEGIN")
             // Create an order
             const sqlOrder = 'INSERT INTO order (user, order_status) VALUES($1, $2) RETURNING *';
-            const createdOrder = await conn.query(sqlOrder,
+            const createdOrder = (await conn.query(sqlOrder,
                                                     [
                                                         o.user_id,
                                                         o.order_status_id
-                                                    ]);
+                                                    ])).rows[0] as Order;
 
             // Create order items
             const sqlOrderItem = 'INSERT INTO order_item (order, product, quantity) \
                                     VALUES($1, $2, $3) RETURNING *';
             for (let item in oi) {
-                const orderitem = (item as OrderItem);
+                const orderitem = (item as unknown as OrderItem);
                 let resultItem = await conn.query(sqlOrderItem,
                                                     [
-                                                        item.
-                                                    ])
+                                                        createdOrder.order_status_id,
+                                                        orderitem.product_id,
+                                                        orderitem.quantity
+                                                    ]);
 
             }
             // end transaction
             await client.query("COMMIT")
             conn.release();
 
-            return createdOrder.rows[0];
+            return createdOrder;
         } catch (err) {
-            throw new Error(`Could not add new book ${pi.name}. Error: ${err}`)
+            throw new Error(`Could not add new order for the user ${o.user_id}. Error: ${err}`)
         }
     }
 
-    async delete(id: string): Promise<ProductItem> {
+    async delete(id: string): Promise<Order> {
         try {
-            const sql = 'DELETE FROM product WHERE id=($1)';
-            // @ts-ignore
-            const conn = await Client.connect();
-            const result = await conn.query(sql, [id]);
-            const productItem = result.rows[0];
+            const sqlOrder = 'DELETE FROM order WHERE id=($1)';
+            const sqlOrderItem = 'DELETE FROM order_item WHERE order=($1)';
+
+            // DB query
+            const conn = await client.connect();
+            // start transaction
+            await client.query("BEGIN");
+            // delete items
+            const resultItems = await conn.query(sqlOrderItem, [id]);
+            // delete order
+            const resultOrder = await conn.query(sqlOrder, [id]);
+
+            // end transaction
+            await client.query("COMMIT")
             conn.release();
 
-            return productItem;
+            return resultOrder.rows[0];
         } catch (err) {
             throw new Error(`Could not delete book ${id}. Error: ${err}`)
         }

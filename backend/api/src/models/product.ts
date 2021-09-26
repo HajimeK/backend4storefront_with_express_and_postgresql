@@ -54,9 +54,6 @@ export class ModelProduct {
         }
     }
 
-
-    //- [OPTIONAL] Top 5 most popular products
-
     async show(id: string): Promise<Product> {
         try {
             const sql = 'SELECT * FROM product WHERE id=($1)';
