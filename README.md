@@ -355,20 +355,13 @@ LEFT JOIN product_category ON product.category_id = product_category.id;
 
 ##### Fields
 
-``` ts
-export type OrderItem = {
+export type User = {
     id: number,
-    product_id: number,
-    quantity: number,
+    email: string;
+    firstName: string,
+    lastName: string,
+    password: string
 };
-
-export type Order = {
-    id: number,
-    user_id: number,
-    order_status_id: number,
-    item: OrderItem[]
-}
-```
 
 ##### Create table
 
@@ -376,9 +369,9 @@ export type Order = {
 CREATE TABLE IF NOT EXISTS user (
   id SERIAL,
   email VARCHAR NOT NULL,
-  firstName VARCHAR,
-  lastName VARCHAR,
-  userpassword VARCHAR,
+  firstName VARCHAR NOT NULL,
+  lastName VARCHAR NOT NULL,
+  userpassword VARCHAR NOT NULL,
   PRIMARY KEY (id)
 );
 ```
@@ -457,12 +450,21 @@ INSERT INTO user VALUES
 
 ##### Fields
 
-- id
-- product_id (id of each product in the order)
-- quantity (quantity of each product in the order)
-- user_id
-- order_status_id (status of order (active or complete))
 
+``` ts
+export type Order = {
+    id: number,
+    user_id: number,
+    order_status_id: number,
+    item: OrderItem[]
+};
+
+export type OrderItem = {
+    id: number,
+    product_id: number,
+    quantity: number,
+};
+```
 ##### Create table
 
 ``` sql

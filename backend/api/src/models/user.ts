@@ -35,7 +35,7 @@ export class ModelUser {
         }
     }
 
-    async show(id: string): Promise<User> {
+    async show(id: number): Promise<User> {
         try {
             const sql = 'SELECT user.id, user.email. user.firstname, user.lastname \
                             FROM user \
@@ -72,10 +72,38 @@ export class ModelUser {
         } catch(error) {
             throw new Error(`unable to create a uer ${u.lastName}, ${u.firstName}: ${error}`);
         }
-
     }
 
-    async delete(id: string): Promise<User> {
+    async update(u: User): Promise<User> {
+        try {
+            const conn = await client.connect();
+            const hash = bcrypt.hashSync(u.password + process.env.BCRYPT_PASSWORD , Number(process.env.SALT_ROUND));
+            const sql = 'UPDATE user \
+                            SET email = $1, \
+                                first_name   = $2 \
+                                last_name = $3 \
+                                userpassword = $4; \
+                            WHERE  user.id = $5 \
+                            RETURNING *;';
+            // request to DB
+            const result = await conn.query(sql,
+                                            [
+                                                u.email,
+                                                u.firstName,
+                                                u.lastName,
+                                                hash,
+                                                u.id
+                                            ]);
+            const user = result.rows[0];
+            conn.release()
+
+            return user;
+        } catch(error) {
+            throw new Error(`unable to create a uer ${u.lastName}, ${u.firstName}: ${error}`);
+        }
+    }
+
+    async delete(id: number): Promise<User> {
         try {
             const sql = 'DELETE FROM product WHERE id=($1)';
             // request to DB

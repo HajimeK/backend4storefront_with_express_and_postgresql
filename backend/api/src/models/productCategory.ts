@@ -20,7 +20,7 @@ export class ModelProductCategory {
         }
     }
 
-    async show(id: string): Promise<ProductCategory> {
+    async show(id: number): Promise<ProductCategory> {
         try {
             const sql = 'SELECT * FROM product_category WHERE id=($1)';
             const conn = await Client.connect();
@@ -47,7 +47,30 @@ export class ModelProductCategory {
         }
     }
 
-    async delete(id: string): Promise<ProductCategory> {
+    async update(c: ProductCategory): Promise<ProductCategory> {
+        try {
+            const sql = 'UPDATE product_category \
+                            SET category = $1 \
+                            WHERE  id = $2 \
+                            RETURNING *;';
+
+            const conn = await Client.connect();
+            // request to DB
+            const result = await conn.query(sql,
+                                            [
+                                                c.category,
+                                                c.id
+                                            ]);
+            conn.release();
+
+            const user = result.rows[0];
+            return user;
+        } catch(error) {
+            throw new Error(`unable to update a category ${c.category}: ${error}`);
+        }
+    }
+
+    async delete(id: number): Promise<ProductCategory> {
         try {
             const sql = 'DELETE FROM product_category WHERE id=($1)';
             const conn = await Client.connect();

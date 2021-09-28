@@ -3,10 +3,13 @@ import morgan from 'morgan'; // log output
 import helmet from 'helmet'; // secure header
 import cors from 'cors'; // Cross-Origine
 import rateLimit from 'express-rate-limit';
+import product from './routes/product/index';
+import user from './routes/user/index';
+import order from './routes/order/index';
 
 // Defind application
-export const app: express.Application = express()
-const address: string = "0.0.0.0:3000"
+export const app: express.Application = express();
+const address: string = "0.0.0.0:3000";
 
 app.use(morgan("common"));
 app.use(helmet());
@@ -27,8 +30,13 @@ app.use(limitter);
 
 app.use(express.json())
 
-app.get('/', function (req: Request, res: Response) {
-    res.send('Hello World!')
+// router
+app.use('/product', product);
+app.use('/user', user);
+app.use('/order', order);
+
+app.get('/', function (request: Request, response: Response) {
+    response.status(200).send('Receving requests from your IP address:' + request.ip);
 })
 
 app.listen(3000, function () {

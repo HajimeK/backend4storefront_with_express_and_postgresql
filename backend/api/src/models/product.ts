@@ -4,25 +4,12 @@ export type Product = {
     id: number,
     name: string,
     price: number,
-    category?: string
+    category?: number
 };
 
 export class ModelProduct {
 
-    /*
-    * /products?top=<true | false>&num=<number(default 5)>?category=<catetory>
-    *
-    * @param {boolean} top: [Optional]true to get top. If not specified
-    * @param {number} num: [Optional] Only work with top.The numbe of items to get. Default value is 5.
-    * @param {string} category: [Optional] the product category. The category should match that are stored in the category table.
-    * @return {json array} list of products
-    *        [ id :{
-    *                  product_name: <{string} product name>,
-    *                  price: <{number} >
-    *              },
-    *           ...]
-    */
-    async index(category?: string, top?: boolean, num?: number): Promise<Product[]> {
+    async index(category?: number, top?: boolean, num?: number): Promise<Product[]> {
         try {
             // Generate SQL query
             const sql1 = 'SELECT product.id, product.product_name, product.price, product_category.category \
@@ -54,7 +41,7 @@ export class ModelProduct {
         }
     }
 
-    async show(id: string): Promise<Product> {
+    async show(id: number): Promise<Product> {
         try {
             const sql = 'SELECT * FROM product WHERE id=($1)';
             // @ts-ignore
@@ -83,7 +70,32 @@ export class ModelProduct {
         }
     }
 
-    async delete(id: string): Promise<Product> {
+    async update(p: Product): Promise<Product> {
+        try {
+            const sql = 'UPDATE product \
+                            SET product_name = $1, \
+                                price = $2, \
+                                category = $3 \
+                            WHERE  product.id = $4 \
+                            RETURNING *;';
+
+            const conn = await client.connect();
+            // request to DB
+            const result = await conn.query(sql,
+                                            [
+                                                p.name,
+                                                p.price,
+                                                p.category
+                                            ]);
+            conn.release();
+            const product = result.rows[0];
+            return product;
+        } catch(error) {
+            throw new Error(`unable to update a product ${p.name} ${p.price} ${p.category}: ${error}`);
+        }
+    }
+
+    async delete(id: number): Promise<Product> {
         try {
             const sql = 'DELETE FROM product WHERE id=($1)';
             // @ts-ignore

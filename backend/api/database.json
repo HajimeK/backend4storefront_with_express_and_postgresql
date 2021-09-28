@@ -1,8 +1,8 @@
 {
-    "dev": {
+    "prod": {
         "driver": "pg",
         "host": "127.0.0.1",
-        "database": "backend4storefront_dev",
+        "database": "backend4storefront",
         "user": "root",
         "password": "P@ssw0rd1234"
     },
@@ -11,6 +11,6 @@
         "host": "127.0.0.1",
         "database": "backend4storefront_test",
         "user": "root",
-        "password": "P@ssw0rd123"
+        "password": "P@ssw0rd1234"
     }
 }
