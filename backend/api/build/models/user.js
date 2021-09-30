@@ -13,8 +13,8 @@ class ModelUser {
     async index() {
         try {
             // Generate SQL query
-            const sql = 'SELECT user.id, user.email. user.firstname, user.lastname \
-                        FROM user';
+            const sql = 'SELECT appuser.id, appuser.email. appuser.firstname, appuser.lastname \
+                        FROM appuser;';
             // request to DB
             const conn = await database_1.default.connect();
             const result = await conn.query(sql);
@@ -27,12 +27,12 @@ class ModelUser {
     }
     async show(id) {
         try {
-            const sql = 'SELECT user.id, user.email. user.firstname, user.lastname \
-                            FROM user \
-                            WHERE id=($1)';
+            const sql = `SELECT appuser.id, appuser.email. appuser.firstname, appuser.lastname \
+                            FROM appuser \
+                            WHERE id=${id};`;
             // request to DB
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql, [id]);
+            const result = await conn.query(sql);
             conn.release();
             return result.rows[0];
         }
@@ -44,15 +44,10 @@ class ModelUser {
         try {
             const conn = await database_1.default.connect();
             const hash = bcrypt_1.default.hashSync(u.password + BCRYPT_PASSWORD, Number(SALT_ROUNDS));
-            const sql = 'INSERT INTO user (email, first_name, last_name, userpassword ) \
-                        VALUES($1, $2, $3, $4) RETURNING *';
+            const sql = `INSERT INTO appuser (email, firstname, lastname, userpassword ) \
+                        VALUES(${u.email}, ${u.firstName}, ${u.lastName}, ${hash}) RETURNING *;`;
             // request to DB
-            const result = await conn.query(sql, [
-                u.email,
-                u.firstName,
-                u.lastName,
-                hash
-            ]);
+            const result = await conn.query(sql);
             const user = result.rows[0];
             conn.release();
             return user;
@@ -65,21 +60,15 @@ class ModelUser {
         try {
             const conn = await database_1.default.connect();
             const hash = bcrypt_1.default.hashSync(u.password + process.env.BCRYPT_PASSWORD, Number(process.env.SALT_ROUND));
-            const sql = 'UPDATE user \
-                            SET email = $1, \
-                                first_name   = $2 \
-                                last_name = $3 \
-                                userpassword = $4; \
-                            WHERE  user.id = $5 \
-                            RETURNING *;';
+            const sql = `UPDATE appuser \
+                            SET email = ${u.email}, \
+                                firstname   = ${u.firstName} \
+                                lastname = ${u.lastName} \
+                                userpassword = ${hash}; \
+                            WHERE  appuser.id = ${u.id} \
+                            RETURNING *;`;
             // request to DB
-            const result = await conn.query(sql, [
-                u.email,
-                u.firstName,
-                u.lastName,
-                hash,
-                u.id
-            ]);
+            const result = await conn.query(sql);
             const user = result.rows[0];
             conn.release();
             return user;
@@ -90,22 +79,22 @@ class ModelUser {
     }
     async delete(id) {
         try {
-            const sql = 'DELETE FROM product WHERE id=($1)';
+            const sql = `DELETE FROM appuser WHERE id=${id}`;
             // request to DB
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql, [id]);
+            const result = await conn.query(sql);
             const user = result.rows[0];
             conn.release();
             return user;
         }
         catch (error) {
-            throw new Error(`Could not delete book ${id}. Error: ${error.message}`);
+            throw new Error(`Could not delete user ${id}. Error: ${error.message}`);
         }
     }
     async authenticate(email, password) {
-        const sql = "SELECT password FROM user WHERE email=($1)";
+        const sql = `SELECT password FROM appuser WHERE email=${email}`;
         const conn = await database_1.default.connect();
-        const result = await conn.query(sql, [email]);
+        const result = await conn.query(sql);
         conn.release();
         if (result.rows.length) {
             const user = result.rows[0];

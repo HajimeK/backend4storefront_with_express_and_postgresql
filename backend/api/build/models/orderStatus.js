@@ -9,20 +9,20 @@ class ModelOrderStatus {
     async index() {
         try {
             const conn = await database_1.default.connect();
-            const sql = 'SELECT * FROM order_status';
+            const sql = 'SELECT * FROM order_status;';
             const result = await conn.query(sql);
             conn.release();
             return result.rows;
         }
         catch (error) {
-            throw new Error(`Could not get product categories. Error: ${error.message}`);
+            throw new Error(`Could not get order status. Error: ${error.message}`);
         }
     }
     async show(id) {
         try {
-            const sql = 'SELECT * FROM order_status WHERE id=($1)';
+            const sql = `SELECT * FROM order_status WHERE id=${id};`;
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql, [id]);
+            const result = await conn.query(sql);
             conn.release();
             return result.rows[0];
         }
@@ -32,11 +32,9 @@ class ModelOrderStatus {
     }
     async create(os) {
         try {
-            const sql = 'INSERT INTO order_status (status) VALUES($1) RETURNING *';
+            const sql = `INSERT INTO order_status (order_status) VALUES(${os.status}) RETURNING *;`;
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql, [
-                os.status
-            ]);
+            const result = await conn.query(sql);
             const OrderStatus = result.rows[0];
             conn.release();
             return OrderStatus;
@@ -47,16 +45,13 @@ class ModelOrderStatus {
     }
     async update(os) {
         try {
-            const sql = 'UPDATE order_status \
-                            SET status = $1 \
-                            WHERE  id = $2 \
-                            RETURNING *;';
+            const sql = `UPDATE order_status \
+                            SET order_status = ${os.status} \
+                            WHERE  id = ${os.id} \
+                            RETURNING *;`;
             const conn = await database_1.default.connect();
             // request to DB
-            const result = await conn.query(sql, [
-                os.status,
-                os.id
-            ]);
+            const result = await conn.query(sql);
             conn.release();
             const orderStatus = result.rows[0];
             return orderStatus;
@@ -67,9 +62,9 @@ class ModelOrderStatus {
     }
     async delete(id) {
         try {
-            const sql = 'DELETE FROM order_status WHERE id=($1)';
+            const sql = `DELETE FROM order_status WHERE id=${id}`;
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql, [id]);
+            const result = await conn.query(sql);
             const OrderStatus = result.rows[0];
             conn.release();
             return OrderStatus;

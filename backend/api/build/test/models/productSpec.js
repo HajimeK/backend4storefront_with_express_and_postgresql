@@ -17,6 +17,7 @@ describe("Product Model", () => {
             id: 0,
             category: 'category2'
         });
+        console.log(category1.id);
     });
     afterAll(async () => {
         await modelProductCategory.delete(category1.id);

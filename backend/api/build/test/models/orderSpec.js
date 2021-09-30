@@ -5,7 +5,7 @@ const orderStatus_1 = require("../../models/orderStatus");
 const product_1 = require("../../models/product");
 const productCategory_1 = require("../../models/productCategory");
 const user_1 = require("../../models/user");
-describe("Product Model", () => {
+describe("Order Model", () => {
     const model = new order_1.ModelOrder();
     const modelProductCategory = new productCategory_1.ModelProductCategory();
     const modelOrderStatus = new orderStatus_1.ModelOrderStatus();
@@ -21,38 +21,33 @@ describe("Product Model", () => {
     let user;
     beforeAll(async () => {
         // create a product category
-        await modelProductCategory.create({
+        category = await modelProductCategory.create({
             id: 0,
             category: 'category1'
         });
-        category = await modelProductCategory.show(1);
         // create a order status
-        await modelOrderStatus.create({
+        status = await modelOrderStatus.create({
             id: 0,
             status: 'status1'
         });
-        status = await modelOrderStatus.show(1);
-        await modelOrderStatus.create({
+        status_update = await modelOrderStatus.create({
             id: 0,
             status: 'status2'
         });
-        status_update = await modelOrderStatus.show(2);
         // create a product 1
-        await modelProduct.create({
+        product1 = await modelProduct.create({
             id: 0,
             name: 'product1',
             price: 123456,
             category: category.id
         });
-        product1 = await modelProduct.show(1);
         // create a product 2
-        await modelProduct.create({
+        product2 = await modelProduct.create({
             id: 0,
             name: 'product2',
             price: 123456,
             category: category.id
         });
-        product2 = await modelProduct.show(2);
         oi = [
             { id: 0, product_id: product1.id, quantity: 10 },
             { id: 0, product_id: product2.id, quantity: 10 }
@@ -62,14 +57,13 @@ describe("Product Model", () => {
             { id: 0, product_id: product2.id, quantity: 20 }
         ];
         // create a user
-        await modelUser.create({
+        user = await modelUser.create({
             id: 0,
             email: 'email@something.com',
             firstName: 'First',
             lastName: 'Last',
             password: 'Pass'
         });
-        user = await modelUser.show(1);
     });
     afterAll(async () => {
         // delete a user

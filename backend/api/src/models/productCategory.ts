@@ -21,7 +21,7 @@ export class ModelProductCategory {
 
     async show(id: number): Promise<ProductCategory> {
         try {
-            const sql = 'SELECT * FROM product_category WHERE id=($1)';
+            const sql = `SELECT * FROM product_category WHERE id=${id}`;
             const conn = await client.connect();
             const result = await conn.query(sql, [id]);
             conn.release();
@@ -34,10 +34,9 @@ export class ModelProductCategory {
 
     async create(c: ProductCategory): Promise<ProductCategory> {
         try {
-            const sql = 'INSERT INTO product_category (category) VALUES($1) RETURNING *';
-            const conn = await client.connect()
-
-            const result = await conn.query(sql, [c.category]);
+            const sql = `INSERT INTO product_category (category) VALUES(${c.category}) RETURNING *`;
+            const conn = await client.connect();
+            const result = await conn.query(sql);
             const Category = result.rows[0] as ProductCategory;
             conn.release();
 
@@ -49,18 +48,14 @@ export class ModelProductCategory {
 
     async update(c: ProductCategory): Promise<ProductCategory> {
         try {
-            const sql = 'UPDATE product_category \
-                            SET category = $1 \
-                            WHERE  id = $2 \
-                            RETURNING *;';
+            const sql = `UPDATE product_category \
+                            SET category = ${c.category} \
+                            WHERE  id = ${c.id} \
+                            RETURNING *;`;
 
             const conn = await client.connect();
             // request to DB
-            const result = await conn.query(sql,
-                                            [
-                                                c.category,
-                                                c.id
-                                            ]);
+            const result = await conn.query(sql);
             conn.release();
 
             return result.rows[0] as ProductCategory;
@@ -71,12 +66,9 @@ export class ModelProductCategory {
 
     async delete(id: number): Promise<ProductCategory> {
         try {
-            const sql = 'DELETE FROM product_category WHERE id=($1)';
+            const sql = `DELETE FROM product_category WHERE id=${id}`;
             const conn = await client.connect();
-            const result = await conn.query(sql,
-                                            [
-                                                id
-                                            ]);
+            const result = await conn.query(sql);
             const Category = result.rows[0] as ProductCategory;
             conn.release();
 

@@ -1,1 +1,3 @@
 backend/api/node_modules/**
+backend/api/package-lock.json
+backend/api/build/**

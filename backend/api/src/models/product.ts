@@ -12,13 +12,13 @@ export class ModelProduct {
     async index(category?: number, top?: boolean, num?: number): Promise<Product[]> {
         try {
             // Generate SQL query
-            const sql1 = 'SELECT product.id, product.product_name, product.price, product_category.category \
-                        FROM product';
-            let sql2_category = '';
-            const sql3 = 'LEFT JOIN product_category ON product.category_id = product_category.id;';
-            const sql4_topN = '';
+            const sql1 = 'SELECT * FROM alias_product \
+                            (SELECT * FROM product \
+                                LEFT JOIN product_category ON product.category_id = product_category.id) AS alias_product';
+            const sql2_topN = '';
+            let sql3_category = '';
             if (typeof category !== 'undefined') {
-                sql2_category = ' WHERE product.id=${category}';
+                sql3_category = ` WHERE alias_product.category_id=${category}`;
             }
             if(typeof top !== 'undefined') {
                 // let n = 5;
@@ -33,18 +33,18 @@ export class ModelProduct {
 
             // request to DB
             const conn = await client.connect();
-            const result = await conn.query(sql1 + sql2_category + sql3 + sql4_topN);
+            const result = await conn.query(sql1 + sql2_topN + sql3_category);
             conn.release();
 
             return result.rows as Product[];
         } catch (error) {
-            throw new Error(`Could not get books. Error: ${(error as Error).message}`);
+            throw new Error(`Could not get products. Error: ${(error as Error).message}`);
         }
     }
 
     async show(id: number): Promise<Product> {
         try {
-            const sql = 'SELECT * FROM product WHERE id=($1)';
+            const sql = `SELECT * FROM product WHERE id=${id}`;
 
             const conn = await client.connect();
             const result = await conn.query(sql, [id]);
@@ -58,16 +58,21 @@ export class ModelProduct {
 
     async create(p: Product): Promise<Product> {
         try {
-            const sql = 'INSERT INTO product (name, price, category) VALUES($1, $2, $3) RETURNING *';
+            let sql = '';
+            if(p.category!== undefined) {
+                sql = `INSERT INTO product (product_name, price, fk_category_id) VALUES(${p.name}, ${p.price}, ${p.category} RETURNING *;`;
+            } else {
+                sql = `INSERT INTO product (product_name, price, fk_category_id) VALUES(${p.name}, ${p.price} RETURNING *;`;
+            }
 
             const conn = await client.connect();
-            const result = await conn.query(sql, [p.name, p.price, p.category]);
+            const result = await conn.query(sql);
             const Product = result.rows[0] as Product;
             conn.release();
 
             return Product;
         } catch (error) {
-            throw new Error(`Could not add new book ${p.name}. Error: ${(error as Error).message}`)
+            throw new Error(`Could not add new product ${p.name}. Error: ${(error as Error).message}`)
         }
     }
 
@@ -106,7 +111,7 @@ export class ModelProduct {
 
             return result.rows[0] as Product;
         } catch (error) {
-            throw new Error(`Could not delete book ${id}. Error: ${(error as Error).message}`);
+            throw new Error(`Could not delete product ${id}. Error: ${(error as Error).message}`);
         }
     }
 }

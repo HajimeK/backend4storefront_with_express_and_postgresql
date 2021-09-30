@@ -12,7 +12,7 @@ describe("User Model", () => {
             password: 'Pass'
         });
         expect(result).toEqual({
-            id: 1,
+            id: 0,
             email: 'email@something.com',
             firstName: 'First',
             lastName: 'Last',

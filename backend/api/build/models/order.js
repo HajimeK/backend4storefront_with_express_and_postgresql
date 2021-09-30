@@ -9,14 +9,14 @@ class ModelOrder {
     async index(user_id, status) {
         try {
             // Generate SQL query
-            const sql1 = 'SELECT * FROM order ';
-            const sql2 = `WHERE order.user_id = ${user_id} `;
+            const sql1 = 'SELECT * FROM apporder ';
+            const sql2 = `WHERE apporder.fk_appuser_id = ${user_id} `;
             let sql3 = '';
             if (typeof status !== 'undefined') {
-                sql3 = `AND order_status_id = ${status} `;
+                sql3 = `AND fk_order_status_id = ${status} `;
             }
-            const sql4 = 'LEFT OUTER JOIN order_item \
-                            ON order.id = order_item.order';
+            const sql4 = 'LEFT OUTER JOIN apporder_item \
+                            ON order.id = apporder_item.fk_order_id';
             // request to DB
             const conn = await database_1.default.connect();
             const result = await conn.query(sql1 + sql2 + sql3 + sql4);
@@ -29,10 +29,13 @@ class ModelOrder {
     }
     async show(id) {
         try {
-            const sql = 'SELECT * FROM order \
-                            LEFT OUTER JOIN order_item \
-                            WHERE order.id=($id) \
-                            ON order.id = order_item.order';
+            const sql = `SELECT * FROM \
+                            ( \
+                                SELECT * FROM apporder \
+                                LEFT OUTER JOIN apporder_item \
+                                ON (apporder.id = apporder_item.fk_order_id) \
+                            ) AS alias_order \
+                            WHERE alias_order.id=${id};`;
             const conn = await database_1.default.connect();
             const result = await conn.query(sql, [id]);
             conn.release();
@@ -49,24 +52,17 @@ class ModelOrder {
             // start transaction
             await database_1.default.query("BEGIN");
             // Create an order
-            const sqlOrder = 'INSERT INTO order \
-                                (user, order_status) \
-                                VALUES($1, $2) RETURNING *';
-            const createdOrder = (await conn.query(sqlOrder, [
-                o.user_id,
-                o.order_status_id
-            ])).rows[0];
+            const sqlOrder = `INSERT INTO apporder \
+                                (fk_appuser_id, fk_order_status_id) \
+                                VALUES(${o.user_id}, ${o.order_status_id}) RETURNING *`;
+            const createdOrder = (await conn.query(sqlOrder)).rows[0];
             // Create order items
-            const sqlOrderItem = 'INSERT INTO order_item \
-                                    (order, product, quantity) \
-                                    VALUES($1, $2, $3) RETURNING *';
             o.item.forEach(item => {
                 const orderitem = item;
-                conn.query(sqlOrderItem, [
-                    createdOrder.id,
-                    orderitem.product_id,
-                    orderitem.quantity
-                ])
+                const sqlOrderItem = `INSERT INTO apporder_item \
+                                        (fk_order_id, fk_product_id, quantity) \
+                                        VALUES(${createdOrder.id}, ${orderitem.product_id}, ${orderitem.quantity}) RETURNING *`;
+                conn.query(sqlOrderItem)
                     .then(resolve => {
                     console.log(resolve);
                 })
@@ -91,29 +87,22 @@ class ModelOrder {
             // start transaction
             await database_1.default.query("BEGIN");
             // Create an order
-            const sqlOrder = 'UPDATE order \
-                                SET order_status = $1 \
-                                WHERE  order.id = $2 \
-                                RETURNING *;';
-            const updatedOrder = (await conn.query(sqlOrder, [
-                o.user_id,
-                o.order_status_id
-            ])).rows[0];
+            const sqlOrder = `UPDATE apporder \
+                                SET fk_order_status_id = ${o.user_id} \
+                                WHERE  apporder.id = ${o.order_status_id} \
+                                RETURNING *;`;
+            const updatedOrder = (await conn.query(sqlOrder)).rows[0];
             // To simplify delete and re-create order items
             // First delete
-            const sqlOrderItemDelete = 'DELETE FROM order_item WHERE order=($1)';
+            const sqlOrderItemDelete = 'DELETE FROM apporder_item WHERE fk_order_id=($1)';
             await conn.query(sqlOrderItemDelete, [o.id]);
             // then Create order items
-            const sqlOrderItem = 'INSERT INTO order_item \
-                                    (order, product, quantity) \
-                                    VALUES($1, $2, $3) RETURNING *';
             o.item.forEach(item => {
                 const orderitem = item;
-                conn.query(sqlOrderItem, [
-                    updatedOrder.id,
-                    orderitem.product_id,
-                    orderitem.quantity
-                ])
+                const sqlOrderItem = `INSERT INTO apporder_item \
+                                        (fk_order_id, fk_product_id, quantity) \
+                                        VALUES(${updatedOrder.id}, ${orderitem.product_id}, ${orderitem.quantity}) RETURNING *`;
+                conn.query(sqlOrderItem)
                     .then(resolve => {
                     console.log(resolve);
                 })
@@ -132,23 +121,23 @@ class ModelOrder {
     }
     async delete(id) {
         try {
-            const sqlOrder = 'DELETE FROM order WHERE id=($1)';
-            const sqlOrderItem = 'DELETE FROM order_item WHERE order=($1)';
+            const sqlOrder = `DELETE FROM apporder WHERE id=${id}`;
+            const sqlOrderItem = `DELETE FROM apporder_item WHERE fk_order_id=${id}`;
             // DB query
             const conn = await database_1.default.connect();
             // start transaction
             await database_1.default.query("BEGIN");
             // delete items
-            await conn.query(sqlOrderItem, [id]);
+            await conn.query(sqlOrderItem);
             // delete order
-            const resultOrder = await conn.query(sqlOrder, [id]);
+            const resultOrder = await conn.query(sqlOrder);
             // end transaction
             await database_1.default.query("COMMIT");
             conn.release();
             return resultOrder.rows[0];
         }
         catch (error) {
-            throw new Error(`Could not delete book ${id}. Error: ${error.message}`);
+            throw new Error(`Could not delete an order ${id}. Error: ${error.message}`);
         }
     }
 }
