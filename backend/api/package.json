@@ -4,13 +4,13 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
-    "build": "npx tsc",
-    "check-types": "tsc --noEmit",
     "lint": "eslint ./src/**/*.ts",
+    "check-types": "tsc --noEmit",
+    "build": "npx tsc",
     "jasmine": "jasmine --config=spec/jasmine.json",
     "test": "ENV=test db-migrate --env test up && jasmine-ts && db-migrate db:drop test",
     "dev": "nodemon src/server.ts",
-    "run": "node dist/server.js",
+    "run": "node build/server.js",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess 'node ./dist/server.js'"
   },
   "author": "Udacity",
