@@ -25,17 +25,17 @@ const model = new ModelProduct();
 *              },
 *           ...]
 */
-product.get('/index', async (request, response) => {
-    try {
-        const category = parseInt(request.query.category as string);
-        const top = request.query.top == "true";
-        const num = parseInt(request.query.num as string);
-        const p_list = await model.index(category, top, num);
-
-        return response.status(200).send(p_list);
-    } catch(error) {
-        return response.status(400).send(`Could not get books. Error: ${error}`);
-    }
+product.get('/index', (request, response) => {
+    const category = parseInt(request.query.category as string);
+    const top = request.query.top == "true";
+    const num = parseInt(request.query.num as string);
+    model.index(category, top, num)
+    .then(products => {
+        return response.status(200).send(products);
+    })
+    .catch(error => {
+        return response.status(400).send(`Could not get books. Error: ${(error as Error).message}`);
+    })
 });
 
 /*
@@ -49,15 +49,15 @@ product.get('/index', async (request, response) => {
 *              },
 *           ...]
 */
-product.get('/show/:id', async (request, response) => {
-    const id = parseInt(request.params.id as string);
-    try {
-        const p = await model.show(id);
-
-        return response.status(200).send(p);
-    } catch(error) {
-        return response.status(400).send(`Could not get books. Error: ${error}`);
-    }
+product.get('/show/:id', (request, response) => {
+    const id = parseInt(request.params.id);
+    model.show(id)
+    .then(product => {
+        return response.status(200).send(product);
+    })
+    .catch(error => {
+        return response.status(400).send(`Could not get books. Error: ${(error as Error).message}`);
+    });
 });
 
 /*
@@ -72,14 +72,14 @@ product.get('/show/:id', async (request, response) => {
 *           ...]
 */
 product.post('/create', verifyAuthToken, async (request, response) => {
-    const p = request.body.product as Product;
+    const p = request.body as Product;
     console.log(p);
     try {
         const p_created = await model.create(p);
 
         return response.status(200).send(p_created);
     } catch(error) {
-        return response.status(400).send(`Could not create a product ${p}. Error: ${error}`);
+        return response.status(400).send(`Could not create a product ${p.name}. Error: ${(error as Error).message}`);
     }
 });
 
@@ -90,7 +90,7 @@ product.delete('/:id', verifyAuthToken, async (request, response) => {
 
         return response.status(200).send(product);
     } catch(error) {
-        return response.status(400).send(`Could not create a product ${product}. Error: ${error}`);
+        return response.status(400).send(`Could not create a product ${id}. Error: ${(error as Error).message}`);
     }
 });
 

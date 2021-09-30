@@ -6,20 +6,20 @@ import jwt from "jsonwebtoken";
 dotenv.config();
 const { TOKEN_SECRET } = process.env;
 
-export function verifyAuthToken(request: Request, response: Response, next: NextFunction)  {
+export function verifyAuthToken(request: Request, response: Response, next: NextFunction): void  {
     try {
         const authorizationHeader = request.headers.authorization;
         if (authorizationHeader) {
             const token = authorizationHeader.split(' ')[1];
-            const decoded = jwt.verify(token, process.env.TOKEN_SECRET as string);
+            jwt.verify(token, TOKEN_SECRET as string);
         } else  {
-            throw Error('Missing Token, where reuired');
+            throw Error('Missing Token, it is reuired in your request');
         }
 
         next()
     } catch (error) {
         response
         .status(401)
-        .send(`${error}`);
+        .send(`${(error as Error).message}`);
     }
 }

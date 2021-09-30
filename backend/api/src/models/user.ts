@@ -3,13 +3,13 @@ import dotenv from 'dotenv';
 
 import client from '../database';
 
-export type User = {
-    id: number,
+export interface User {
+    id: number;
     email: string;
     firstName: string,
-    lastName: string,
-    password: string
-};
+    lastName: string;
+    password: string;
+}
 
 dotenv.config();
 const {
@@ -29,9 +29,10 @@ export class ModelUser {
             const result = await conn.query(sql);
             conn.release();
 
-            return result.rows;
+
+            return result.rows as User[];
         } catch (error) {
-            throw new Error(`Could not get users. Error: ${error}`);
+            throw new Error(`Could not get users. Error: ${(error as Error).message}`);
         }
     }
 
@@ -45,16 +46,17 @@ export class ModelUser {
             const result = await conn.query(sql, [id]);
             conn.release();
 
-            return result.rows[0];
+            return result.rows[0] as User;
         } catch (error) {
-            throw new Error(`Could not find a user ${id}. Error: ${error}`);
+            throw new Error(`Could not find a user ${id}. Error: ${(error as Error).message}`);
         }
     }
 
     async create(u: User): Promise<User> {
         try {
             const conn = await client.connect();
-            const hash = bcrypt.hashSync(u.password + process.env.BCRYPT_PASSWORD , Number(process.env.SALT_ROUND));
+            const hash = bcrypt.hashSync(u.password + (BCRYPT_PASSWORD as string),
+                                        Number(SALT_ROUNDS));
             const sql = 'INSERT INTO user (email, first_name, last_name, userpassword ) \
                         VALUES($1, $2, $3, $4) RETURNING *';
             // request to DB
@@ -65,19 +67,20 @@ export class ModelUser {
                                                 u.lastName,
                                                 hash
                                             ]);
-            const user = result.rows[0];
+            const user = result.rows[0] as User;
             conn.release()
 
             return user;
         } catch(error) {
-            throw new Error(`unable to create a uer ${u.lastName}, ${u.firstName}: ${error}`);
+            throw new Error(`unable to create a uer ${u.lastName}, ${u.firstName}: ${(error as Error).message}`);
         }
     }
 
     async update(u: User): Promise<User> {
         try {
             const conn = await client.connect();
-            const hash = bcrypt.hashSync(u.password + process.env.BCRYPT_PASSWORD , Number(process.env.SALT_ROUND));
+            const hash = bcrypt.hashSync(u.password + (process.env.BCRYPT_PASSWORD as string),
+                                        Number(process.env.SALT_ROUND));
             const sql = 'UPDATE user \
                             SET email = $1, \
                                 first_name   = $2 \
@@ -94,12 +97,12 @@ export class ModelUser {
                                                 hash,
                                                 u.id
                                             ]);
-            const user = result.rows[0];
+            const user = result.rows[0] as User;
             conn.release()
 
             return user;
         } catch(error) {
-            throw new Error(`unable to create a uer ${u.lastName}, ${u.firstName}: ${error}`);
+            throw new Error(`unable to create a uer ${u.lastName}, ${u.firstName}: ${(error as Error).message}`);
         }
     }
 
@@ -109,12 +112,12 @@ export class ModelUser {
             // request to DB
             const conn = await client.connect();
             const result = await conn.query(sql, [id]);
-            const user = result.rows[0];
+            const user = result.rows[0] as User;
             conn.release();
 
             return user;
         } catch (error) {
-            throw new Error(`Could not delete book ${id}. Error: ${error}`)
+            throw new Error(`Could not delete book ${id}. Error: ${(error as Error).message}`)
         }
     }
 
@@ -127,9 +130,10 @@ export class ModelUser {
         conn.release();
 
         if(result.rows.length) {
-            const user = result.rows[0];
+            const user = result.rows[0] as User;
             console.log(user);
-            if(bcrypt.compareSync(password+BCRYPT_PASSWORD, user.password)) {
+            if(bcrypt.compareSync(password+(process.env.BCRYPT_PASSWORD as string),
+                                    user.password)) {
                 return user;
             } else {
                 return null;
@@ -139,4 +143,4 @@ export class ModelUser {
             return null;
         }
     }
-};
+}

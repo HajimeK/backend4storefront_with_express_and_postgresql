@@ -1,38 +1,27 @@
-import { Product, ModelProduct } from '../../models/product';
-import { ModelProductCategory } from '../../models/productCategory';
+import { ModelProduct } from '../../models/product';
+import { ModelProductCategory, ProductCategory } from '../../models/productCategory';
 
-const model = new ModelProduct();
+describe("Product Model", () => {
 
-describe("Product Model", async () => {
-    it('should have an index method', () => {
-        expect(model.index).toBeDefined();
-    });
-
-    it('should have a show method', () => {
-        expect(model.show).toBeDefined();
-    });
-
-    it('should have a create method', () => {
-        expect(model.create).toBeDefined();
-    });
-
-    it('should have a update method', () => {
-        expect(model.update).toBeDefined();
-    });
-
-    it('should have a delete method', () => {
-        expect(model.delete).toBeDefined();
-    });
-
+    const model = new ModelProduct();
     // create product categories
     const modelProductCategory = new ModelProductCategory();
-    const category1 = await modelProductCategory.create({
-        id: 0,
-        category: 'category1'
+    let category1: ProductCategory;
+    let category2: ProductCategory;
+    beforeAll(async () => {
+        category1 = await modelProductCategory.create({
+            id: 0,
+            category: 'category1'
+        });
+        category2 = await modelProductCategory.create({
+            id: 0,
+            category: 'category2'
+        });
     });
-    const category2 = await modelProductCategory.create({
-        id: 0,
-        category: 'category2'
+
+    afterAll(async () => {
+        await modelProductCategory.delete(category1.id);
+        await modelProductCategory.delete(category2.id);
     });
 
     it('create method should add a product', async () => {
@@ -121,8 +110,8 @@ describe("Product Model", async () => {
     });
 
     it('delete method should remove the product', async () => {
-        model.delete(1);
-        model.delete(2);
+        await model.delete(1);
+        await model.delete(2);
         const result = await model.index()
 
         expect(result).toEqual([]);
@@ -137,14 +126,14 @@ describe("Product Model", async () => {
             price: 123456
         });
         expect(result).toEqual({
-            id: 2,
+            id: 3,
             name: 'product_no_category',
             price: 123456
         });
     });
 
     it('delete method should remove the product', async () => {
-        model.delete(2);
+        await model.delete(3);
         const result = await model.index()
 
         expect(result).toEqual([]);

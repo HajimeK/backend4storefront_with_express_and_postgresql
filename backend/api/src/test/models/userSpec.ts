@@ -1,31 +1,8 @@
-import { User, ModelUser } from '../../models/user';
+import { ModelUser } from '../../models/user';
 
 const model = new ModelUser();
 
 describe("User Model", () => {
-    it('should have an index method', () => {
-        expect(model.index).toBeDefined();
-    });
-
-    it('should have a show method', () => {
-        expect(model.show).toBeDefined();
-    });
-
-    it('should have a create method', () => {
-        expect(model.create).toBeDefined();
-    });
-
-    it('should have a update method', () => {
-        expect(model.update).toBeDefined();
-    });
-
-    it('should have a delete method', () => {
-        expect(model.delete).toBeDefined();
-    });
-
-    it('should have a authenticate method', () => {
-        expect(model.authenticate).toBeDefined();
-    });
 
     it('create method should add a user', async () => {
         const result = await model.create({
@@ -84,7 +61,7 @@ describe("User Model", () => {
     });
 
     it('delete method should remove the user', async () => {
-        model.delete(1);
+        await model.delete(1);
         const result = await model.index()
 
         expect(result).toEqual([]);

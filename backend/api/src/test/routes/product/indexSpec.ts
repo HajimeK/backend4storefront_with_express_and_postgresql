@@ -1,40 +1,52 @@
 import request from 'supertest';
 import { app } from '../../../server';
-import { ModelProductCategory } from '../../../models/productCategory';
-import { ModelUser } from '../../../models/user';
+import { ModelProductCategory, ProductCategory } from '../../../models/productCategory';
+import { ModelUser, User } from '../../../models/user';
+import { loginToken } from '../../../routes/user';
 
-const req = request(app);
+describe('Test Suite for /product', () => {
 
-describe('Test Suite for /product', async () => {
-
-    // preparations for the test
-    // create product categories
+    const req = request(app);
     const modelProductCategory = new ModelProductCategory();
-    const category1 = await modelProductCategory.create({
-        id: 0,
-        category: 'category1'
-    });
-    const category2 = await modelProductCategory.create({
-        id: 0,
-        category: 'category2'
-    });
     const modelUser = new ModelUser();
-    const user = await modelUser.create({
-        id: 0,
-        email: 'email@something.com',
-        firstName: 'First',
-        lastName: 'Last',
-        password: 'Pass'
+
+    let category1: ProductCategory;
+    let category2: ProductCategory;
+    let user: User;
+    let token: string;
+
+    beforeAll(async () => {
+        category1 = await modelProductCategory.create({
+            id: 0,
+            category: 'category1'
+        });
+        category2 = await modelProductCategory.create({
+            id: 0,
+            category: 'category2'
+        });
+        user = await modelUser.create({
+            id: 0,
+            email: 'email@something.com',
+            firstName: 'First',
+            lastName: 'Last',
+            password: 'Pass'
+        });
+        // login to get auth token
+        const login = await req.post('/user/login').send({email: 'email@something.com', password: 'Pass'});
+        token = (login.body as loginToken).token;
     });
 
-    // login to get auth token
-    const login = await req.post('/user/login').send({email: 'email@something.com', password: 'Pass'});
+    afterAll(async () => {
+        await modelUser.delete(user.id);
+        await modelProductCategory.delete(category1.id);
+        await modelProductCategory.delete(category2.id);
+    });
 
     // - Create [token required]
     it('/product/create create method should add a product (first)', async () => {
         await req
             .post('/product/create')
-            .set('Authorization: ', `Bearer ${login.body.token}`)
+            .set('Authorization: ', `Bearer ${token}`)
             .send(
                 {
                     id: 0,
@@ -60,7 +72,7 @@ describe('Test Suite for /product', async () => {
     it('/product/create create method should add a product (2nd)', async () => {
         await req
             .post('/product/create')
-            .set('Authorization: ', `Bearer ${login.body.token}`)
+            .set('Authorization: ', `Bearer ${token}`)
             .send(
                 {
                     id: 0,
@@ -164,8 +176,4 @@ describe('Test Suite for /product', async () => {
                 .toEqual([]);
             });
     });
-
-    modelUser.delete(user.id);
-    modelProductCategory.delete(category1.id);
-    modelProductCategory.delete(category2.id);
 });

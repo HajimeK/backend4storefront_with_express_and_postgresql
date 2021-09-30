@@ -1,17 +1,16 @@
-import { PoolClient } from 'pg';
 import client from '../database';
 
-export type OrderItem = {
-    id: number,
-    product_id: number,
-    quantity: number,
-};
+export interface OrderItem {
+    id: number;
+    product_id: number;
+    quantity: number;
+}
 
-export type Order = {
-    id: number,
-    user_id: number,
-    order_status_id: number,
-    item: OrderItem[]
+export interface Order {
+    id: number;
+    user_id: number;
+    order_status_id: number;
+    item: OrderItem[];
 }
 
 export class ModelOrder {
@@ -21,7 +20,7 @@ export class ModelOrder {
             // Generate SQL query
             const sql1 = 'SELECT * FROM order ';
             const sql2 = `WHERE order.user_id = ${user_id} `;
-            var   sql3 = '';
+            let   sql3 = '';
             if (typeof status !== 'undefined') {
                 sql3 = `AND order_status_id = ${status} `;
             }
@@ -33,9 +32,9 @@ export class ModelOrder {
             const result = await conn.query(sql1 + sql2 + sql3 + sql4);
             conn.release();
 
-            return result.rows;
-        } catch (err) {
-            throw new Error(`Could not get orders. Error: ${err}`);
+            return result.rows as Order[];
+        } catch (error) {
+            throw new Error(`Could not get orders. Error: ${(error as Error).message}`);
         }
     }
 
@@ -50,9 +49,9 @@ export class ModelOrder {
             const result = await conn.query(sql, [id]);
             conn.release();
 
-            return result.rows[0];
-        } catch (err) {
-            throw new Error(`Could not find order ${id}. Error: ${err}`);
+            return result.rows[0] as Order;
+        } catch (error) {
+            throw new Error(`Could not find order ${id}. Error: ${(error as Error).message}`);
         }
     }
 
@@ -76,23 +75,29 @@ export class ModelOrder {
             const sqlOrderItem = 'INSERT INTO order_item \
                                     (order, product, quantity) \
                                     VALUES($1, $2, $3) RETURNING *';
-            for (let item in o.item) {
+            o.item.forEach(item => {
                 const orderitem = (item as unknown as OrderItem);
-                let resultItem = await conn.query(sqlOrderItem,
-                                                    [
-                                                        createdOrder.id,
-                                                        orderitem.product_id,
-                                                        orderitem.quantity
-                                                    ]);
-
-            }
+                conn.query(sqlOrderItem,
+                    [
+                        createdOrder.id,
+                        orderitem.product_id,
+                        orderitem.quantity
+                    ])
+                .then( resolve => {
+                    console.log(resolve);
+                })
+                .catch( reject => {
+                    throw new Error(reject);
+                });
+            });
             // end transaction
             await client.query("COMMIT")
             conn.release();
 
             return createdOrder;
-        } catch (err) {
-            throw new Error(`Could not add new order for the user ${o.user_id}. Error: ${err}`)
+        } catch (error) {
+            await client.query("ROLLBACK");
+            throw new Error(`Could not add new order for the user ${o.user_id}. Error: ${(error as Error).message}`)
         }
     }
 
@@ -122,23 +127,29 @@ export class ModelOrder {
             const sqlOrderItem = 'INSERT INTO order_item \
                                     (order, product, quantity) \
                                     VALUES($1, $2, $3) RETURNING *';
-            for (let item in o.item) {
+            o.item.forEach(item => {
                 const orderitem = (item as unknown as OrderItem);
-                let resultItem = await conn.query(sqlOrderItem,
-                                                    [
-                                                        updatedOrder.id,
-                                                        orderitem.product_id,
-                                                        orderitem.quantity
-                                                    ]);
-            }
+                conn.query(sqlOrderItem,
+                            [
+                                updatedOrder.id,
+                                orderitem.product_id,
+                                orderitem.quantity
+                            ])
+                .then( resolve => {
+                    console.log(resolve);
+                })
+                .catch( reject => {
+                    throw new Error(reject);
+                });
+            });
 
             // end transaction
             await client.query("COMMIT")
             conn.release();
-            const order = updatedOrder;
-            return order;
+
+            return updatedOrder;
         } catch(error) {
-            throw new Error(`unable to update an order ${o.id}: ${error}`);
+            throw new Error(`unable to update an order ${o.id}: ${(error as Error).message}`);
         }
     }
 
@@ -152,7 +163,7 @@ export class ModelOrder {
             // start transaction
             await client.query("BEGIN");
             // delete items
-            const resultItems = await conn.query(sqlOrderItem, [id]);
+            await conn.query(sqlOrderItem, [id]);
             // delete order
             const resultOrder = await conn.query(sqlOrder, [id]);
 
@@ -160,25 +171,10 @@ export class ModelOrder {
             await client.query("COMMIT")
             conn.release();
 
-            return resultOrder.rows[0];
-        } catch (err) {
-            throw new Error(`Could not delete book ${id}. Error: ${err}`)
+            return resultOrder.rows[0] as Order;
+        } catch (error) {
+            throw new Error(`Could not delete book ${id}. Error: ${(error as Error).message}`)
         }
     }
-
-    async createOrderItem(o: Order, ois: OrderItem[], conn: PoolClient): Promise<void> {
-        const sqlOrderItem = 'INSERT INTO order_item \
-                                (order, product, quantity) \
-                                VALUES($1, $2, $3) RETURNING *';
-        for (let item in ois) {
-            const orderitem = (item as unknown as OrderItem);
-            let resultItem = await conn.query(sqlOrderItem,
-                        [
-                            o.id,
-                            orderitem.product_id,
-                            orderitem.quantity
-                        ]);
-        }
-    }
-};
+}
 

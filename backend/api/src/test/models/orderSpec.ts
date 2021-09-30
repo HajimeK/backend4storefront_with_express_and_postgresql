@@ -1,88 +1,95 @@
-import { Order, ModelOrder } from '../../models/order';
-import { ModelOrderStatus } from '../../models/orderStatus';
-import { ModelProduct } from '../../models/product';
-import { ModelProductCategory } from '../../models/productCategory';
-import { ModelUser } from '../../models/user';
+import { ModelOrder, OrderItem } from '../../models/order';
+import { ModelOrderStatus, OrderStatus } from '../../models/orderStatus';
+import { ModelProduct, Product } from '../../models/product';
+import { ModelProductCategory, ProductCategory } from '../../models/productCategory';
+import { ModelUser, User } from '../../models/user';
 
-const model = new ModelOrder();
-const modelProductCategory = new ModelProductCategory();
-const modelOrderStatus = new ModelOrderStatus();
-const modelProduct = new ModelProduct();
-const modelUser = new ModelUser();
 
-describe("Product Model", async () => {
-    it('should have an index method', () => {
-        expect(model.index).toBeDefined();
+describe("Product Model", () => {
+
+    const model = new ModelOrder();
+    const modelProductCategory = new ModelProductCategory();
+    const modelOrderStatus = new ModelOrderStatus();
+    const modelProduct = new ModelProduct();
+    const modelUser = new ModelUser();
+
+    let category : ProductCategory;
+    let status : OrderStatus;
+    let status_update : OrderStatus;
+    let product1: Product;
+    let product2: Product;
+    let oi: OrderItem[];
+    let oi_update:OrderItem[];
+    let user: User;
+
+    beforeAll(async () => {
+        // create a product category
+        await modelProductCategory.create({
+            id: 0,
+            category: 'category1'
+        });
+        category = await modelProductCategory.show(1);
+        // create a order status
+        await modelOrderStatus.create({
+            id: 0,
+            status: 'status1'
+        });
+        status = await modelOrderStatus.show(1);
+        await modelOrderStatus.create({
+            id: 0,
+            status: 'status2'
+        });
+        status_update = await modelOrderStatus.show(2);
+        // create a product 1
+        await modelProduct.create({
+            id: 0,
+            name: 'product1',
+            price: 123456,
+            category: category.id
+        });
+        product1 = await modelProduct.show(1);
+        // create a product 2
+        await modelProduct.create({
+            id: 0,
+            name: 'product2',
+            price: 123456,
+            category: category.id
+        });
+        product2 = await modelProduct.show(2);
+
+        oi = [
+            {id: 0, product_id: product1.id, quantity: 10},
+            {id: 0, product_id: product2.id, quantity: 10}
+        ];
+        oi_update = [
+            {id: 0, product_id: product1.id, quantity: 20},
+            {id: 0, product_id: product2.id, quantity: 20}
+        ];
+
+        // create a user
+        await modelUser.create({
+            id: 0,
+            email: 'email@something.com',
+            firstName: 'First',
+            lastName: 'Last',
+            password: 'Pass'
+        });
+        user = await modelUser.show(1);
+
     });
 
-    it('should have a show method', () => {
-        expect(model.show).toBeDefined();
+    afterAll( async () => {
+        // delete a user
+        await modelUser.delete(user.id);
+        // delete a product
+        await modelProduct.delete(product2.id);
+        // delete a product
+        await modelProduct.delete(product1.id);
+        // delete a order status
+        await modelOrderStatus.delete(status.id);
+        // delete a product category
+        await modelProductCategory.delete(category.id);
     });
-
-    it('should have a create method', () => {
-        expect(model.create).toBeDefined();
-    });
-
-    it('should have a update method', () => {
-        expect(model.update).toBeDefined();
-    });
-
-    it('should have a delete method', () => {
-        expect(model.delete).toBeDefined();
-    });
-
-    // create a product category
-    await modelProductCategory.create({
-        id: 0,
-        category: 'category1'
-    });
-    const category = await modelProductCategory.show(1);
-    // create a order status
-    await modelOrderStatus.create({
-        id: 0,
-        status: 'status1'
-    });
-    const status = await modelProductCategory.show(1);
-    await modelOrderStatus.create({
-        id: 0,
-        status: 'status2'
-    });
-    const status_update = await modelProductCategory.show(2);
-    // create a product 1
-    await modelProduct.create({
-        id: 0,
-        name: 'product1',
-        price: 123456,
-        category: category.id
-    });
-    const product1 = await modelProduct.show(1);
-    // create a product 2
-    await modelProduct.create({
-        id: 0,
-        name: 'product2',
-        price: 123456,
-        category: category.id
-    });
-    const product2 = await modelProduct.show(2);
-
-    const oi = [
-        {id: 0, product_id: product1.id, quantity: 10},
-        {id: 0, product_id: product2.id, quantity: 10}
-    ];
-    const oi_update = [
-        {id: 0, product_id: product1.id, quantity: 20},
-        {id: 0, product_id: product2.id, quantity: 20}
-    ];
-
-    // create a user
-    await modelUser.create({
-        id: 0,
-        email: 'email@something.com',
-        firstName: 'First',
-        lastName: 'Last',
-        password: 'Pass'
-    });
-    const user = await modelUser.show(1);
 
     it('create method should add an order', async () => {
         const result = await model.create({
@@ -150,19 +157,9 @@ describe("Product Model", async () => {
     });
 
     it('delete method should remove the order', async () => {
-        model.delete(1);
+        await model.delete(1);
         const result = await model.index(user.id)
         expect(result).toEqual([]);
     });
 
-    // delete a user
-    await modelUser.delete(user.id);
-    // delete a product
-    await modelProduct.delete(product2.id);
-    // delete a product
-    await modelProduct.delete(product1.id);
-    // delete a order status
-    await modelOrderStatus.delete(status.id);
-    // delete a product category
-    await modelProductCategory.delete(category.id);
 });

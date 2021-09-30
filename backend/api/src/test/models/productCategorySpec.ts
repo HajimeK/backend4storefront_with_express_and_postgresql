@@ -1,27 +1,8 @@
-import { ProductCategory, ModelProductCategory } from '../../models/ProductCategory';
+import { ModelProductCategory } from '../../models/productCategory';
 
 const model = new ModelProductCategory();
 
 describe("Product Category Model", () => {
-    it('should have an index method', () => {
-        expect(model.index).toBeDefined();
-    });
-
-    it('should have a show method', () => {
-        expect(model.show).toBeDefined();
-    });
-
-    it('should have a create method', () => {
-        expect(model.create).toBeDefined();
-    });
-
-    it('should have a update method', () => {
-        expect(model.update).toBeDefined();
-    });
-
-    it('should have a delete method', () => {
-        expect(model.delete).toBeDefined();
-    });
 
     it('create method should add a Product Category', async () => {
         const result = await model.create({
@@ -62,7 +43,7 @@ describe("Product Category Model", () => {
     });
 
     it('delete method should remove the product category', async () => {
-        model.delete(1);
+        await model.delete(1);
         const result = await model.index()
 
         expect(result).toEqual([]);

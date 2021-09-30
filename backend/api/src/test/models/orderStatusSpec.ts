@@ -1,27 +1,8 @@
-import { OrderStatus, ModelOrderStatus } from '../../models/orderStatus';
+import { ModelOrderStatus } from '../../models/orderStatus';
 
 const model = new ModelOrderStatus();
 
 describe("Order Status Model", () => {
-    it('should have an index method', () => {
-        expect(model.index).toBeDefined();
-    });
-
-    it('should have a show method', () => {
-        expect(model.show).toBeDefined();
-    });
-
-    it('should have a create method', () => {
-        expect(model.create).toBeDefined();
-    });
-
-    it('should have a update method', () => {
-        expect(model.update).toBeDefined();
-    });
-
-    it('should have a delete method', () => {
-        expect(model.delete).toBeDefined();
-    });
 
     it('create method should add a Order Status', async () => {
         const result = await model.create({
@@ -62,7 +43,7 @@ describe("Order Status Model", () => {
     });
 
     it('delete method should remove the Order Status', async () => {
-        model.delete(1);
+        await model.delete(1);
         const result = await model.index()
 
         expect(result).toEqual([]);
