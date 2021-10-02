@@ -42,7 +42,7 @@ class ModelUser {
     async create(u) {
         try {
             const conn = await database_1.default.connect();
-            const hash = bcrypt_1.default.hashSync(u.password + BCRYPT_PASSWORD, Number(SALT_ROUNDS));
+            const hash = bcrypt_1.default.hashSync(u.userpassword + BCRYPT_PASSWORD, Number(SALT_ROUNDS));
             const sql = `INSERT INTO appuser (email, firstname, lastname, userpassword ) \
                         VALUES('${u.email}', '${u.firstname}', '${u.lastname}', '${hash}') RETURNING *`;
             // request to DB
@@ -58,7 +58,7 @@ class ModelUser {
     async update(u) {
         try {
             const conn = await database_1.default.connect();
-            const hash = bcrypt_1.default.hashSync(u.password + process.env.BCRYPT_PASSWORD, Number(process.env.SALT_ROUND));
+            const hash = bcrypt_1.default.hashSync(u.userpassword + process.env.BCRYPT_PASSWORD, Number(process.env.SALT_ROUND));
             const sql = `UPDATE appuser \
                             SET email = '${u.email}', \
                                 firstname   = '${u.firstname}', \
@@ -91,14 +91,13 @@ class ModelUser {
         }
     }
     async authenticate(email, password) {
-        const sql = `SELECT password FROM appuser WHERE email=${email}`;
+        const sql = `SELECT * FROM appuser WHERE email='${email}'`;
         const conn = await database_1.default.connect();
         const result = await conn.query(sql);
         conn.release();
         if (result.rows.length) {
             const user = result.rows[0];
-            console.log(user);
-            if (bcrypt_1.default.compareSync(password + process.env.BCRYPT_PASSWORD, user.password)) {
+            if (bcrypt_1.default.compareSync(password + process.env.BCRYPT_PASSWORD, user.userpassword)) {
                 return user;
             }
             else {

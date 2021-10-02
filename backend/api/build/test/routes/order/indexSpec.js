@@ -63,7 +63,7 @@ describe('Test suite for /order', () => {
             email: 'email@something.com',
             firstname: 'First',
             lastname: 'Last',
-            password: 'Pass'
+            userpassword: 'Pass'
         });
         // login to get auth token
         const login = await req.post('/user/login').send({ email: 'email@something.com', password: 'Pass' });

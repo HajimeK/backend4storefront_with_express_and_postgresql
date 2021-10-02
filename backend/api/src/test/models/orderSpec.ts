@@ -57,7 +57,7 @@ describe("Order Model", () => {
             email: 'email@something.com',
             firstname: 'First',
             lastname: 'Last',
-            password: 'Pass'
+            userpassword: 'Pass'
         });
     });
 

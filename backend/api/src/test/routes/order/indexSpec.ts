@@ -66,7 +66,7 @@ describe('Test suite for /order', () => {
             email: 'email@something.com',
             firstname: 'First',
             lastname: 'Last',
-            password: 'Pass'
+            userpassword: 'Pass'
         });
 
         // login to get auth token

@@ -57,6 +57,7 @@ user.delete('/:id', auth_1.verifyAuthToken, async (request, response) => {
 });
 user.post('/login', (request, response) => {
     const credential = request.body;
+    console.log(credential);
     if (!credential || !credential.email || !credential.password) {
         return response.status(400).send('Missing email/password in request body');
     }

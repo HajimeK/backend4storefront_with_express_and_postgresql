@@ -8,7 +8,7 @@ export interface User {
     email: string;
     firstname: string,
     lastname: string;
-    password: string;
+    userpassword: string;
 }
 
 dotenv.config();
@@ -54,7 +54,7 @@ export class ModelUser {
     async create(u: User): Promise<User> {
         try {
             const conn = await client.connect();
-            const hash = bcrypt.hashSync(u.password + (BCRYPT_PASSWORD as string),
+            const hash = bcrypt.hashSync(u.userpassword + (BCRYPT_PASSWORD as string),
                                         Number(SALT_ROUNDS));
             const sql = `INSERT INTO appuser (email, firstname, lastname, userpassword ) \
                         VALUES('${u.email}', '${u.firstname}', '${u.lastname}', '${hash}') RETURNING *`;
@@ -72,7 +72,7 @@ export class ModelUser {
     async update(u: User): Promise<User> {
         try {
             const conn = await client.connect();
-            const hash = bcrypt.hashSync(u.password + (process.env.BCRYPT_PASSWORD as string),
+            const hash = bcrypt.hashSync(u.userpassword + (process.env.BCRYPT_PASSWORD as string),
                                         Number(process.env.SALT_ROUND));
             const sql = `UPDATE appuser \
                             SET email = '${u.email}', \
@@ -109,7 +109,7 @@ export class ModelUser {
 
     async authenticate(email: string, password: string): Promise<User | null> {
 
-        const sql = `SELECT password FROM appuser WHERE email=${email}`;
+        const sql = `SELECT * FROM appuser WHERE email='${email}'`;
 
         const conn = await client.connect();
         const result = await conn.query(sql);
@@ -117,14 +117,11 @@ export class ModelUser {
 
         if(result.rows.length) {
             const user = result.rows[0] as User;
-            console.log(user);
-            if(bcrypt.compareSync(password+(process.env.BCRYPT_PASSWORD as string),
-                                    user.password)) {
+            if(bcrypt.compareSync(password+ (process.env.BCRYPT_PASSWORD as string), user.userpassword)) {
                 return user;
             } else {
                 return null;
             }
-
         } else {
             return null;
         }

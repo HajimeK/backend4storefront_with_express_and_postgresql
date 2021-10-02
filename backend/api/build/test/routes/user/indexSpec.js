@@ -20,7 +20,7 @@ describe('Test suite for /user', () => {
             email: 'email@something.com',
             firstname: 'First',
             lastname: 'Last',
-            password: 'Pass'
+            userpassword: 'Pass'
         });
     });
     afterAll(async () => {

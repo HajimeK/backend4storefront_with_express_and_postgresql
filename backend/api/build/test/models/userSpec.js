@@ -10,7 +10,7 @@ describe("User Model", () => {
             email: 'email@something.com',
             firstname: 'First',
             lastname: 'Last',
-            password: 'Pass'
+            userpassword: 'Pass'
         });
         expect(user.email).toEqual('email@something.com');
         expect(user.firstname).toEqual('First');
@@ -26,13 +26,25 @@ describe("User Model", () => {
         expect(result.firstname).toEqual('First');
         expect(result.lastname).toEqual('Last');
     });
+    it('authenticate with correst user/pass to approve login', async () => {
+        const result = await model.authenticate('email@something.com', 'Pass');
+        expect(result).not.toBeNull();
+    });
+    it('authenticate with wrong pass to approve login', async () => {
+        const result = await model.authenticate('email@something.com', 'Wrong');
+        expect(result).toBeNull();
+    });
+    it('authenticate with wrong user to approve login', async () => {
+        const result = await model.authenticate('wrong@something.com', 'Pass');
+        expect(result).toBeNull();
+    });
     it('update method should update a product fields', async () => {
         const result = await model.update({
             id: user.id,
             email: 'email_update@something.com',
             firstname: 'First_update',
             lastname: 'Last_update',
-            password: 'Pass_update'
+            userpassword: 'Pass_update'
         });
         expect(result.email).toEqual('email_update@something.com');
         expect(result.firstname).toEqual('First_update');
