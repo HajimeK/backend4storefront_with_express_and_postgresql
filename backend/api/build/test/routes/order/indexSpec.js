@@ -23,6 +23,7 @@ describe('Test suite for /order', () => {
     let oi;
     let user;
     let token;
+    let orderid = 0;
     const req = (0, supertest_1.default)(server_1.default);
     beforeAll(async () => {
         // create a product category
@@ -86,35 +87,24 @@ describe('Test suite for /order', () => {
             .auth(token, { type: 'bearer' })
             .send({
             id: 0,
-            user_id: user.id,
-            order_status_id: status_update.id,
-            item: oi
+            appuser: user.id,
+            order_status: order_status.id
         })
             .expect(200)
             .expect((response) => {
-            expect(response.body)
-                .toEqual({
-                id: 1,
-                user_id: user.id,
-                order_status_id: status_update.id,
-                item: oi
-            });
+            const order = response.body;
+            expect(order.appuser).toBe(user.id);
+            expect(order.order_status).toBe(order_status.id);
+            orderid = order.id;
         });
     });
-    it('/order/index/1 index method should return a list of order for user', async () => {
+    it(`/order/index/userid index method should return a list of order for user`, async () => {
         await req.get(`/order/index/${user.id}`)
             .auth(token, { type: 'bearer' })
             .expect(200)
             .expect((response) => {
-            expect(response.body)
-                .toEqual([
-                {
-                    id: 1,
-                    user_id: user.id,
-                    order_status_id: status_update.id,
-                    item: oi
-                }
-            ]);
+            const orders = response.body;
+            expect(orders.length).toBe(1);
         });
     });
     it('/order/index/1?status=2 index method should return a list of order for user with completed', async () => {
@@ -122,29 +112,19 @@ describe('Test suite for /order', () => {
             .auth(token, { type: 'bearer' })
             .expect(200)
             .expect((response) => {
-            expect(response.body)
-                .toEqual([
-                {
-                    id: 1,
-                    user_id: user.id,
-                    order_status_id: status_update.id,
-                    item: oi
-                }
-            ]);
+            const order = response.body;
+            expect(order.appuser).toBe(user.id);
+            expect(order.order_status).toBe(order_status.id);
         });
     });
-    it('/order/show/1 show method should return the correct order', async () => {
-        await req.get(`/order/show/1`)
+    it(`/order/show/${orderid} show method should return the correct order`, async () => {
+        await req.get(`/order/show/${orderid}`)
             .auth(token, { type: 'bearer' })
             .expect(200)
             .expect((response) => {
-            expect(response.body)
-                .toEqual({
-                id: 1,
-                user_id: user.id,
-                order_status_id: status_update.id,
-                item: oi
-            });
+            const order = response.body;
+            expect(order.appuser).toBe(user.id);
+            expect(order.order_status).toBe(order_status.id);
         });
     });
     it('/order/delete delete method should remove the order', async () => {
