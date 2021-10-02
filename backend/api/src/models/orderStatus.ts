@@ -2,7 +2,7 @@ import client from '../database'
 
 export interface OrderStatus {
     id: number;
-    status: string;
+    order_status: string;
 }
 
 export class ModelOrderStatus {
@@ -35,7 +35,7 @@ export class ModelOrderStatus {
 
     async create(os: OrderStatus): Promise<OrderStatus> {
         try {
-            const sql = `INSERT INTO order_status (order_status) VALUES(${os.status}) RETURNING *;`;
+            const sql = `INSERT INTO order_status (order_status) VALUES('${os.order_status}') RETURNING *;`;
 
             const conn = await client.connect();
             const result = await conn.query(sql);
@@ -44,26 +44,25 @@ export class ModelOrderStatus {
 
             return OrderStatus;
         } catch (error) {
-            throw new Error(`Could not add new OrderStatus ${os.status}. Error: ${(error as Error).message}`);
+            throw new Error(`Could not add new OrderStatus ${os.order_status}. Error: ${(error as Error).message}`);
         }
     }
 
     async update(os: OrderStatus): Promise<OrderStatus> {
         try {
             const sql = `UPDATE order_status \
-                            SET order_status = ${os.status} \
-                            WHERE  id = ${os.id} \
+                            SET order_status='${os.order_status}' \
+                            WHERE  order_status.id = ${os.id} \
                             RETURNING *;`;
 
             const conn = await client.connect();
             // request to DB
-            const result = await conn.query(sql);
+            const orderStatus = (await conn.query(sql)).rows[0] as OrderStatus;
             conn.release();
 
-            const orderStatus = result.rows[0] as OrderStatus;
             return orderStatus;
         } catch(error) {
-            throw new Error(`unable to update an order status ${os.status}: ${(error as Error).message}`);
+            throw new Error(`unable to update an order status ${os.order_status}: ${(error as Error).message}`);
         }
     }
 

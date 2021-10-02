@@ -32,7 +32,7 @@ class ModelOrderStatus {
     }
     async create(os) {
         try {
-            const sql = `INSERT INTO order_status (order_status) VALUES(${os.status}) RETURNING *;`;
+            const sql = `INSERT INTO order_status (order_status) VALUES('${os.order_status}') RETURNING *;`;
             const conn = await database_1.default.connect();
             const result = await conn.query(sql);
             const OrderStatus = result.rows[0];
@@ -40,24 +40,23 @@ class ModelOrderStatus {
             return OrderStatus;
         }
         catch (error) {
-            throw new Error(`Could not add new OrderStatus ${os.status}. Error: ${error.message}`);
+            throw new Error(`Could not add new OrderStatus ${os.order_status}. Error: ${error.message}`);
         }
     }
     async update(os) {
         try {
             const sql = `UPDATE order_status \
-                            SET order_status = ${os.status} \
-                            WHERE  id = ${os.id} \
+                            SET order_status='${os.order_status}' \
+                            WHERE  order_status.id = ${os.id} \
                             RETURNING *;`;
             const conn = await database_1.default.connect();
             // request to DB
-            const result = await conn.query(sql);
+            const orderStatus = (await conn.query(sql)).rows[0];
             conn.release();
-            const orderStatus = result.rows[0];
             return orderStatus;
         }
         catch (error) {
-            throw new Error(`unable to update an order status ${os.status}: ${error.message}`);
+            throw new Error(`unable to update an order status ${os.order_status}: ${error.message}`);
         }
     }
     async delete(id) {

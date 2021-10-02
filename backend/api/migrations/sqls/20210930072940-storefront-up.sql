@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS product (
   id SERIAL,
   product_name VARCHAR(128) NOT NULL,
   price INT NOT NULL,
-  fk_category_id INT,
-    FOREIGN KEY (fk_category_id)
+  category INT,
+    FOREIGN KEY (category)
     REFERENCES product_category (id),
   PRIMARY KEY (id)
 );
@@ -32,11 +32,11 @@ CREATE TABLE IF NOT EXISTS appuser (
 
 CREATE TABLE IF NOT EXISTS apporder (
     id SERIAL,
-    fk_appuser_id INT,
-        FOREIGN KEY (fk_appuser_id)
+    appuser INT,
+        FOREIGN KEY (appuser)
         REFERENCES appuser (id),
-    fk_order_status_id INT,
-        FOREIGN KEY (fk_order_status_id)
+    order_status INT,
+        FOREIGN KEY (order_status)
         REFERENCES order_status (id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
     PRIMARY KEY (id)
@@ -44,11 +44,11 @@ CREATE TABLE IF NOT EXISTS apporder (
 
 CREATE TABLE IF NOT EXISTS apporder_item (
     id SERIAL,
-    fk_order_id INT,
-        FOREIGN KEY (fk_order_id)
+    apporder INT,
+        FOREIGN KEY (apporder)
         REFERENCES apporder (id),
-    fk_product_id INT,
-        FOREIGN KEY (fk_product_id)
+    product INT,
+        FOREIGN KEY (product)
         REFERENCES product (id),
     quantity INT,
     PRIMARY KEY (id)

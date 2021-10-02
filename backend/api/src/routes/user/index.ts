@@ -55,7 +55,7 @@ user.post('/create', verifyAuthToken, async (request, response) => {
 
         return response.status(200).send(u_created);
     } catch(error) {
-        return response.status(400).send(`Could not create a user ${u.firstName} ${u.lastName}. Error: ${(error as Error).message}`);
+        return response.status(400).send(`Could not create a user ${u.firstname} ${u.lastname}. Error: ${(error as Error).message}`);
     }
 });
 
@@ -73,7 +73,7 @@ user.delete('/:id', verifyAuthToken, async (request, response) => {
 user.post('/login', (request, response) => {
     const credential = request.body as loginCredential;
     if (!credential || !credential.email || !credential.password) {
-    return response.status(400).send('Missing email/password in request body');
+        return response.status(400).send('Missing email/password in request body');
     }
 
     model.authenticate(credential.email, credential.password)

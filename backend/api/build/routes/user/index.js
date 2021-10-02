@@ -42,7 +42,7 @@ user.post('/create', auth_1.verifyAuthToken, async (request, response) => {
         return response.status(200).send(u_created);
     }
     catch (error) {
-        return response.status(400).send(`Could not create a user ${u.firstName} ${u.lastName}. Error: ${error.message}`);
+        return response.status(400).send(`Could not create a user ${u.firstname} ${u.lastname}. Error: ${error.message}`);
     }
 });
 user.delete('/:id', auth_1.verifyAuthToken, async (request, response) => {

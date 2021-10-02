@@ -22,9 +22,9 @@ class ModelProductCategory {
         try {
             const sql = `SELECT * FROM product_category WHERE id=${id}`;
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql, [id]);
+            const result = (await conn.query(sql)).rows[0];
             conn.release();
-            return result.rows[0];
+            return result;
         }
         catch (error) {
             throw new Error(`Could not find Category ${id}. Error: ${error.message}`);
@@ -32,7 +32,7 @@ class ModelProductCategory {
     }
     async create(c) {
         try {
-            const sql = `INSERT INTO product_category (category) VALUES(${c.category}) RETURNING *`;
+            const sql = `INSERT INTO product_category (category) VALUES('${c.category}') RETURNING *`;
             const conn = await database_1.default.connect();
             const result = await conn.query(sql);
             const Category = result.rows[0];
@@ -46,7 +46,7 @@ class ModelProductCategory {
     async update(c) {
         try {
             const sql = `UPDATE product_category \
-                            SET category = ${c.category} \
+                            SET category = '${c.category}' \
                             WHERE  id = ${c.id} \
                             RETURNING *;`;
             const conn = await database_1.default.connect();

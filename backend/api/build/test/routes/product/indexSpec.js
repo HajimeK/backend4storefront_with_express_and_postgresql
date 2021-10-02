@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
-const server_1 = require("../../../server");
+const server_1 = __importDefault(require("../../../server"));
 const productCategory_1 = require("../../../models/productCategory");
 const user_1 = require("../../../models/user");
 describe('Test Suite for /product', () => {
-    const req = (0, supertest_1.default)(server_1.app);
+    const req = (0, supertest_1.default)(server_1.default);
     const modelProductCategory = new productCategory_1.ModelProductCategory();
     const modelUser = new user_1.ModelUser();
     let category1;
@@ -27,8 +27,8 @@ describe('Test Suite for /product', () => {
         user = await modelUser.create({
             id: 0,
             email: 'email@something.com',
-            firstName: 'First',
-            lastName: 'Last',
+            firstname: 'First',
+            lastname: 'Last',
             password: 'Pass'
         });
         // login to get auth token
@@ -44,7 +44,7 @@ describe('Test Suite for /product', () => {
     it('/product/create create method should add a product (first)', async () => {
         await req
             .post('/product/create')
-            .set('Authorization: ', `Bearer ${token}`)
+            .auth(token, { type: 'bearer' })
             .send({
             id: 0,
             name: 'product1',
@@ -65,7 +65,7 @@ describe('Test Suite for /product', () => {
     it('/product/create create method should add a product (2nd)', async () => {
         await req
             .post('/product/create')
-            .set('Authorization: ', `Bearer ${token}`)
+            .auth(token, { type: 'bearer' })
             .send({
             id: 0,
             name: 'product2',

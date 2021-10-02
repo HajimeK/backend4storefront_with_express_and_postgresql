@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { app } from '../../../server';
+import app from '../../../server';
 import { ModelProductCategory, ProductCategory } from '../../../models/productCategory';
 import { ModelUser, User } from '../../../models/user';
 import { loginToken } from '../../../routes/user';
@@ -27,8 +27,8 @@ describe('Test Suite for /product', () => {
         user = await modelUser.create({
             id: 0,
             email: 'email@something.com',
-            firstName: 'First',
-            lastName: 'Last',
+            firstname: 'First',
+            lastname: 'Last',
             password: 'Pass'
         });
         // login to get auth token
@@ -46,7 +46,7 @@ describe('Test Suite for /product', () => {
     it('/product/create create method should add a product (first)', async () => {
         await req
             .post('/product/create')
-            .set('Authorization: ', `Bearer ${token}`)
+            .auth(token, {type: 'bearer'})
             .send(
                 {
                     id: 0,
@@ -72,7 +72,7 @@ describe('Test Suite for /product', () => {
     it('/product/create create method should add a product (2nd)', async () => {
         await req
             .post('/product/create')
-            .set('Authorization: ', `Bearer ${token}`)
+            .auth(token, {type: 'bearer'})
             .send(
                 {
                     id: 0,

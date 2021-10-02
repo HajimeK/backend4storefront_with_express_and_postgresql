@@ -16,9 +16,8 @@ describe("Order Model", () => {
     let status_update;
     let product1;
     let product2;
-    let oi;
-    let oi_update;
     let user;
+    let order;
     beforeAll(async () => {
         // create a product category
         category = await modelProductCategory.create({
@@ -28,40 +27,32 @@ describe("Order Model", () => {
         // create a order status
         status = await modelOrderStatus.create({
             id: 0,
-            status: 'status1'
+            order_status: 'status1'
         });
         status_update = await modelOrderStatus.create({
             id: 0,
-            status: 'status2'
+            order_status: 'status2'
         });
         // create a product 1
         product1 = await modelProduct.create({
             id: 0,
-            name: 'product1',
+            product_name: 'product1',
             price: 123456,
             category: category.id
         });
         // create a product 2
         product2 = await modelProduct.create({
             id: 0,
-            name: 'product2',
+            product_name: 'product2',
             price: 123456,
             category: category.id
         });
-        oi = [
-            { id: 0, product_id: product1.id, quantity: 10 },
-            { id: 0, product_id: product2.id, quantity: 10 }
-        ];
-        oi_update = [
-            { id: 0, product_id: product1.id, quantity: 20 },
-            { id: 0, product_id: product2.id, quantity: 20 }
-        ];
         // create a user
         user = await modelUser.create({
             id: 0,
             email: 'email@something.com',
-            firstName: 'First',
-            lastName: 'Last',
+            firstname: 'First',
+            lastname: 'Last',
             password: 'Pass'
         });
     });
@@ -74,71 +65,53 @@ describe("Order Model", () => {
         await modelProduct.delete(product1.id);
         // delete a order status
         await modelOrderStatus.delete(status.id);
+        await modelOrderStatus.delete(status_update.id);
         // delete a product category
         await modelProductCategory.delete(category.id);
     });
     it('create method should add an order', async () => {
-        const result = await model.create({
+        order = await model.create({
             id: 0,
-            user_id: user.id,
-            order_status_id: status.id,
-            item: oi
+            appuser: user.id,
+            order_status: status.id
         });
-        expect(result).toEqual({
-            id: 1,
-            user_id: user.id,
-            order_status_id: status.id,
-            item: oi
-        });
+        expect(order.appuser).toBe(user.id);
+        expect(order.order_status).toBe(status.id);
     });
     it('index method should return a list of order', async () => {
         const result = await model.index(user.id, status.id);
-        expect(result).toEqual([{
-                id: 1,
-                user_id: user.id,
-                order_status_id: status.id,
-                item: oi
-            }]);
+        expect(result).toEqual([order]);
     });
     it('show method should return the correct order', async () => {
-        const result = await model.show(1);
-        expect(result).toEqual({
-            id: 1,
-            user_id: user.id,
-            order_status_id: status.id,
-            item: oi
-        });
+        const result = await model.show(order.id);
+        expect(result).toEqual(order);
     });
     it('update method should update an order status', async () => {
         const result = await model.update({
-            id: 1,
-            user_id: user.id,
-            order_status_id: status_update.id,
-            item: oi
+            id: order.id,
+            appuser: user.id,
+            order_status: status_update.id
         });
         expect(result).toEqual({
-            id: 1,
-            user_id: user.id,
-            order_status_id: status_update.id,
-            item: oi
+            id: order.id,
+            appuser: user.id,
+            order_status: status_update.id
         });
     });
     it('update method should update an order item', async () => {
         const result = await model.update({
-            id: 1,
-            user_id: user.id,
-            order_status_id: status_update.id,
-            item: oi_update
+            id: order.id,
+            appuser: user.id,
+            order_status: status_update.id
         });
         expect(result).toEqual({
-            id: 1,
-            user_id: user.id,
-            order_status_id: status_update.id,
-            item: oi_update
+            id: order.id,
+            appuser: user.id,
+            order_status: status_update.id
         });
     });
     it('delete method should remove the order', async () => {
-        await model.delete(1);
+        await model.delete(order.id);
         const result = await model.index(user.id);
         expect(result).toEqual([]);
     });

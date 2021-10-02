@@ -77,7 +77,7 @@ product.post('/create', auth_1.verifyAuthToken, async (request, response) => {
         return response.status(200).send(p_created);
     }
     catch (error) {
-        return response.status(400).send(`Could not create a product ${p.name}. Error: ${error.message}`);
+        return response.status(400).send(`Could not create a product ${p.product_name}. Error: ${error.message}`);
     }
 });
 product.delete('/:id', auth_1.verifyAuthToken, async (request, response) => {

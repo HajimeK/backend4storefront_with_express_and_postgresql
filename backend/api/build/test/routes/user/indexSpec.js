@@ -4,34 +4,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const supertest_1 = __importDefault(require("supertest"));
-const user_1 = __importDefault(require("../../../routes/user"));
-const user_2 = require("../../../models/user");
-const req = (0, supertest_1.default)(user_1.default);
+const server_1 = __importDefault(require("../../../server"));
+const user_1 = require("../../../models/user");
 // User
 describe('Test suite for /user', () => {
-    const modelUser = new user_2.ModelUser();
+    const modelUser = new user_1.ModelUser();
+    // login to get auth token
     let user;
     let token;
+    const req = (0, supertest_1.default)(server_1.default);
     beforeAll(async () => {
         // create a test user
         user = await modelUser.create({
             id: 0,
             email: 'email@something.com',
-            firstName: 'First',
-            lastName: 'Last',
+            firstname: 'First',
+            lastname: 'Last',
             password: 'Pass'
         });
-        // login to get auth token
-        const login = await req.post('/user/login').send({ email: 'email@something.com', password: 'Pass' });
-        token = login.body.token;
     });
     afterAll(async () => {
         await modelUser.delete(user.id);
     });
+    it('/user/login', async () => {
+        await req
+            .post('/user/login')
+            .send({ email: 'email@something.com', password: 'Pass' })
+            .expect(200);
+    });
     it('/user/create', async () => {
         await req
             .post('/user/create')
-            .set('Authorization: ', `Bearer ${token}`)
+            .auth(token, { type: 'bearer' })
             .send({
             id: 0,
             email: 'email_test@something.com',
@@ -54,7 +58,7 @@ describe('Test suite for /user', () => {
     it('/user/index', async () => {
         await req
             .get('/user/index')
-            .set('Authorization: ', `Bearer ${token}`)
+            .auth(token, { type: 'bearer' })
             .expect(200)
             .expect((response) => {
             const users = response.body;
@@ -64,13 +68,13 @@ describe('Test suite for /user', () => {
     it('/user/show/1', async () => {
         await req
             .get('/user/show/1')
-            .set('Authorization: ', `Bearer ${token}`)
+            .auth(token, { type: 'bearer' })
             .expect(200)
             .expect((response) => {
             const user = response.body;
             expect(user.email).toBe('email@something.com');
-            expect(user.firstName).toBe('First');
-            expect(user.lastName).toBe('Last');
+            expect(user.firstname).toBe('First');
+            expect(user.lastname).toBe('Last');
         });
     });
 });
