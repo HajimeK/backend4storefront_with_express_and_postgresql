@@ -1,6 +1,7 @@
 import request from 'supertest';
 import app from '../../../server';
 import { ModelUser, User } from '../../../models/user';
+import { loginToken } from '../../../routes/user';
 
 // User
 describe('Test suite for /user', () => {
@@ -9,7 +10,10 @@ describe('Test suite for /user', () => {
     // login to get auth token
 
     let user: User;
+    let createdUser: User;
+    let userid = 1;
     let token: string;
+    let credential: loginToken
 
     const req = request(app);
 
@@ -32,7 +36,11 @@ describe('Test suite for /user', () => {
         await req
             .post('/user/login')
             .send({email: 'email@something.com', password: 'Pass'})
-            .expect(200);
+            .expect(200)
+            .expect((res) => {
+                credential = res.body as loginToken;
+                token = credential.token;
+            });
     });
 
     it('/user/create', async () => {
@@ -43,23 +51,18 @@ describe('Test suite for /user', () => {
                 {
                     id: 0,
                     email: 'email_test@something.com',
-                    firstName: 'FirstTest',
-                    lastName: 'LastTest',
-                    password: 'PassTest'
+                    firstname: 'FirstTest',
+                    lastname: 'LastTest',
+                    userpassword: 'PassTest'
                 }
             )
             .expect(200)
-            .expect((response) => {
-                expect(response.body)
-                .toEqual(
-                    {
-                        id: user.id + 1,
-                        email: 'email_test@something.com',
-                        firstName: 'FirstTest',
-                        lastName: 'LastTest',
-                        password: 'PassTest'
-                    }
-                );
+            .expect ( (response) => {
+                createdUser = response.body as User;
+                expect(createdUser.email).toBe('email_test@something.com');
+                expect(createdUser.firstname).toBe('FirstTest');
+                expect(createdUser.lastname).toBe('LastTest');
+                userid = createdUser.id;
             });
     });
 
@@ -74,16 +77,16 @@ describe('Test suite for /user', () => {
             });
     });
 
-    it('/user/show/1', async () => {
+    it(`/user/show/${userid}`, async () => {
         await req
-            .get('/user/show/1')
+            .get(`/user/show/${userid}`)
             .auth(token, {type: 'bearer'})
             .expect(200)
             .expect ( (response) => {
                 const user = response.body as User;
-                expect(user.email).toBe('email@something.com');
-                expect(user.firstname).toBe('First');
-                expect(user.lastname).toBe('Last');
+                expect(user.email).toBe(createdUser.email);
+                expect(user.firstname).toBe(createdUser.firstname);
+                expect(user.lastname).toBe(createdUser.lastname);
             });
     });
 });

@@ -49,7 +49,6 @@ user.get('/show/:id', verifyAuthToken, async (request, response) => {
 
 user.post('/create', verifyAuthToken, async (request, response) => {
     const u = request.body as User;
-    console.log(u);
     try {
         const u_created = await model.create(u);
 
