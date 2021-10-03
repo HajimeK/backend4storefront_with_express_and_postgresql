@@ -3,6 +3,7 @@ import app from '../../../server';
 import { ModelProductCategory, ProductCategory } from '../../../models/productCategory';
 import { ModelUser, User } from '../../../models/user';
 import { loginToken } from '../../../routes/user';
+import { Product } from '../../../models/product';
 
 describe('Test Suite for /product', () => {
 
@@ -14,6 +15,8 @@ describe('Test Suite for /product', () => {
     let category2: ProductCategory;
     let user: User;
     let token: string;
+    let product1id = 0;
+    let product2id = 0;
 
     beforeAll(async () => {
         category1 = await modelProductCategory.create({
@@ -50,22 +53,17 @@ describe('Test Suite for /product', () => {
             .send(
                 {
                     id: 0,
-                    name: 'product1',
+                    product_name: 'product1',
                     price: 123456,
                     category: category1.id
                 }
             )
             .expect(200)
             .expect((response) => {
-                expect(response.body)
-                .toEqual(
-                    {
-                        id: 1,
-                        name: 'product1',
-                        price: 123456,
-                        category: category1.id
-                    }
-                );
+                const product = response.body as Product;
+                expect(product.product_name).toBe('product1');
+                expect(product.price).toBe(123456);
+                product1id = product.id;
             });
     });
 
@@ -76,22 +74,18 @@ describe('Test Suite for /product', () => {
             .send(
                 {
                     id: 0,
-                    name: 'product2',
+                    product_name: 'product2',
                     price: 123456,
                     category: category2.id
                 }
             )
             .expect(200)
             .expect((response) => {
-                expect(response.body)
-                .toEqual(
-                    {
-                        id: 2,
-                        name: 'product2',
-                        price: 123456,
-                        category: category2.id
-                    }
-                );
+                const product = response.body as Product;
+                expect(product.product_name).toBe('product2');
+                expect(product.price).toBe(123456);
+                expect(product.category).toBe(category2.id);
+                product2id = product.id;
             });
     });
 
@@ -102,24 +96,9 @@ describe('Test Suite for /product', () => {
         await req
             .get('/product/index')
             .expect(200)
-            .expect ( (response) => {
-                expect(response.body)
-                .toEqual(
-                    [
-                        {
-                            id: 1,
-                            name: 'product',
-                            price: 123456,
-                            category: category1.id
-                        },
-                        {
-                            id: 2,
-                            name: 'product2',
-                            price: 123456,
-                            category: category2.id
-                        }
-                    ]
-                );
+            .expect((response) => {
+                const products = response.body as Product[];
+                expect(products.length).toBe(2);
             });
     });
 
@@ -127,32 +106,23 @@ describe('Test Suite for /product', () => {
         await req
             .get('/product/index?category=2')
             .expect(200)
-            .expect ( (response) => {
-                expect(response.body)
-                .toEqual(
-                    [
-                        {
-                            id: 2,
-                            name: 'product2',
-                            price: 123456,
-                            category: category2.id
-                        }
-                    ]
-                );
+            .expect((response) => {
+                const products = response.body as Product[];
+                expect(products.length).toBe(1);
             });
     });
 
     // - Show
     it('/product/show/2', async () => {
         await req
-            .get('/product/show/2')
+            .get(`/product/show/${product1id}`)
             .expect(200)
             .expect ( (response) => {
                 expect(response.body)
                 .toEqual(
                     {
-                        id: 1,
-                        name: 'product1',
+                        id: product1id,
+                        product_name: 'product1',
                         price: 123456,
                         category: category1.id
                     }
@@ -163,10 +133,12 @@ describe('Test Suite for /product', () => {
     // - Delete
     it('/product/delete', async () => {
         await req
-            .delete('/product/1')
+            .delete(`/product/${product1id}`)
+            .auth(token, {type: 'bearer'})
             .expect(200);
         await req
-            .delete('/product/2')
+            .delete(`/product/${product2id}`)
+            .auth(token, {type: 'bearer'})
             .expect(200);
         await req
             .get('/product/index')

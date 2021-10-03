@@ -15,6 +15,8 @@ describe('Test Suite for /product', () => {
     let category2;
     let user;
     let token;
+    let product1id = 0;
+    let product2id = 0;
     beforeAll(async () => {
         category1 = await modelProductCategory.create({
             id: 0,
@@ -47,19 +49,16 @@ describe('Test Suite for /product', () => {
             .auth(token, { type: 'bearer' })
             .send({
             id: 0,
-            name: 'product1',
+            product_name: 'product1',
             price: 123456,
             category: category1.id
         })
             .expect(200)
             .expect((response) => {
-            expect(response.body)
-                .toEqual({
-                id: 1,
-                name: 'product1',
-                price: 123456,
-                category: category1.id
-            });
+            const product = response.body;
+            expect(product.product_name).toBe('product1');
+            expect(product.price).toBe(123456);
+            product1id = product.id;
         });
     });
     it('/product/create create method should add a product (2nd)', async () => {
@@ -68,19 +67,17 @@ describe('Test Suite for /product', () => {
             .auth(token, { type: 'bearer' })
             .send({
             id: 0,
-            name: 'product2',
+            product_name: 'product2',
             price: 123456,
             category: category2.id
         })
             .expect(200)
             .expect((response) => {
-            expect(response.body)
-                .toEqual({
-                id: 2,
-                name: 'product2',
-                price: 123456,
-                category: category2.id
-            });
+            const product = response.body;
+            expect(product.product_name).toBe('product2');
+            expect(product.price).toBe(123456);
+            expect(product.category).toBe(category2.id);
+            product2id = product.id;
         });
     });
     // - Inex
@@ -91,21 +88,8 @@ describe('Test Suite for /product', () => {
             .get('/product/index')
             .expect(200)
             .expect((response) => {
-            expect(response.body)
-                .toEqual([
-                {
-                    id: 1,
-                    name: 'product',
-                    price: 123456,
-                    category: category1.id
-                },
-                {
-                    id: 2,
-                    name: 'product2',
-                    price: 123456,
-                    category: category2.id
-                }
-            ]);
+            const products = response.body;
+            expect(products.length).toBe(2);
         });
     });
     it('/product/index?category=2', async () => {
@@ -113,27 +97,20 @@ describe('Test Suite for /product', () => {
             .get('/product/index?category=2')
             .expect(200)
             .expect((response) => {
-            expect(response.body)
-                .toEqual([
-                {
-                    id: 2,
-                    name: 'product2',
-                    price: 123456,
-                    category: category2.id
-                }
-            ]);
+            const products = response.body;
+            expect(products.length).toBe(1);
         });
     });
     // - Show
     it('/product/show/2', async () => {
         await req
-            .get('/product/show/2')
+            .get(`/product/show/${product1id}`)
             .expect(200)
             .expect((response) => {
             expect(response.body)
                 .toEqual({
-                id: 1,
-                name: 'product1',
+                id: product1id,
+                product_name: 'product1',
                 price: 123456,
                 category: category1.id
             });
@@ -142,10 +119,12 @@ describe('Test Suite for /product', () => {
     // - Delete
     it('/product/delete', async () => {
         await req
-            .delete('/product/1')
+            .delete(`/product/${product1id}`)
+            .auth(token, { type: 'bearer' })
             .expect(200);
         await req
-            .delete('/product/2')
+            .delete(`/product/${product2id}`)
+            .auth(token, { type: 'bearer' })
             .expect(200);
         await req
             .get('/product/index')

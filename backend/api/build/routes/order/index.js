@@ -32,8 +32,8 @@ order.get('/index/:user', auth_1.verifyAuthToken, async (request, response) => {
 order.get('/show/:id', (request, response) => {
     const id = parseInt(request.params.id);
     model.show(id)
-        .then(() => {
-        return response.status(200).send(order);
+        .then(returned => {
+        return response.status(200).send(returned);
     })
         .catch(error => {
         return response.status(400).send(`Could not get an order ${id}. Error: ${error.message}`);

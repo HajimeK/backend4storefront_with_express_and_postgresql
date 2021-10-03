@@ -18,9 +18,9 @@ class ModelOrder {
             }
             // request to DB
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql);
+            const orders = (await conn.query(sql)).rows;
             conn.release();
-            return result.rows;
+            return orders;
         }
         catch (error) {
             throw new Error(`Could not get orders. Error: ${error.message}`);
@@ -54,9 +54,9 @@ class ModelOrder {
                             FROM apporder \
                             WHERE id=${id};`;
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql);
+            const order = (await conn.query(sql)).rows[0];
             conn.release();
-            return result.rows[0];
+            return order;
         }
         catch (error) {
             throw new Error(`Could not find order ${id}. Error: ${error.message}`);

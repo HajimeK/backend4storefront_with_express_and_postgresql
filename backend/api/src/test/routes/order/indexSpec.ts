@@ -119,13 +119,13 @@ describe('Test suite for /order', () => {
     });
 
     it('/order/index/1?status=2 index method should return a list of order for user with completed', async () => {
-        await req.get(`/order/index/${user.id}?status=${status_update.id}`)
+        await req.get(`/order/index/${user.id}?status=${order_status.id}`)
             .auth(token, {type: 'bearer'})
             .expect(200)
             .expect((response) => {
-                const order = response.body as Order;
-                expect(order.appuser).toBe(user.id);
-                expect(order.order_status).toBe(order_status.id);
+                const order = response.body as Order[];
+                expect(order[0].appuser).toBe(user.id);
+                expect(order[0].order_status).toBe(order_status.id);
             });
     });
 
@@ -143,6 +143,7 @@ describe('Test suite for /order', () => {
     it('/order/delete delete method should remove the order', async () => {
         await req
             .delete(`/order/${orderid}`)
+            .auth(token, {type: 'bearer'})
             .expect(200);
     });
 });

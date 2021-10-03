@@ -22,7 +22,6 @@ class ModelProduct {
                 // }
                 // sql4_topN = " LIMIT ${n}";
                 // //error until filtering implemented
-                console.log(num);
                 throw Error("not implemented");
             }
             // request to DB

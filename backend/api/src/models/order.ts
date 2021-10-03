@@ -20,10 +20,10 @@ export class ModelOrder {
 
             // request to DB
             const conn = await client.connect();
-            const result = await conn.query(sql);
+            const orders = (await conn.query(sql)).rows as Order[];
             conn.release();
 
-            return result.rows as Order[]
+            return orders;
         } catch (error) {
             throw new Error(`Could not get orders. Error: ${(error as Error).message}`);
         }
@@ -61,10 +61,10 @@ export class ModelOrder {
                             WHERE id=${id};`;
 
             const conn = await client.connect();
-            const result = await conn.query(sql);
+            const order = (await conn.query(sql)).rows[0] as Order;
             conn.release();
 
-            return result.rows[0] as Order;
+            return order;
         } catch (error) {
             throw new Error(`Could not find order ${id}. Error: ${(error as Error).message}`);
         }
