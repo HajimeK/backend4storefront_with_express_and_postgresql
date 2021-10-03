@@ -10,25 +10,21 @@ class ModelProduct {
         try {
             // Generate SQL query
             const sql1 = 'SELECT * FROM product';
-            const sql2_topN = '';
             let sql3_category = '';
-            if (typeof category !== 'undefined') {
-                sql3_category = ` WHERE product.category=${category};`;
+            if (category > 0) {
+                sql3_category = ` WHERE category=${category};`;
             }
             if (typeof top !== 'undefined') {
-                // let n = 5;
-                // if(typeof num !== 'undefined'){
-                //     n = num;
-                // }
-                // sql4_topN = " LIMIT ${n}";
-                // //error until filtering implemented
+                console.log(num);
                 throw Error("not implemented");
             }
+            const sql = sql1 + sql3_category;
             // request to DB
+            console.log(sql);
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql1 + sql2_topN + sql3_category);
+            const products = (await conn.query(sql)).rows;
             conn.release();
-            return result.rows;
+            return products;
         }
         catch (error) {
             throw new Error(`Could not get products. Error: ${error.message}`);
@@ -38,9 +34,9 @@ class ModelProduct {
         try {
             const sql = `SELECT * FROM product WHERE id=${id};`;
             const conn = await database_1.default.connect();
-            const result = await conn.query(sql);
+            const product = (await conn.query(sql)).rows[0];
             conn.release();
-            return result.rows[0];
+            return product;
         }
         catch (error) {
             throw new Error(`Could not find product ${id}. Error: ${error.message}`);

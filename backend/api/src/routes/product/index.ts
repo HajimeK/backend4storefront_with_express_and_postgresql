@@ -12,65 +12,31 @@ product.use(express.json());
 
 const model = new ModelProduct();
 
-/*
-* /product/index?top=<true | false>&num=<number(default 5)>?category=<catetory>
-*
-* @param {boolean} top: [Optional]true to get top. If not specified
-* @param {number} num: [Optional] Only work with top.The numbe of items to get. Default value is 5.
-* @param {string} category: [Optional] the product category. The category should match that are stored in the category table.
-* @return {json array} list of products
-*        [ id :{
-*                  product_name: <{string} product name>,
-*                  price: <{number} >
-*              },
-*           ...]
-*/
-product.get('/index', (request, response) => {
-    const category = parseInt(request.query.category as string);
-    const top = request.query.top == "true";
-    const num = parseInt(request.query.num as string);
-    model.index(category, top, num)
-    .then(products => {
+product.get('/index', async (request, response) => {
+    try {
+        let category = -1;
+        if (request.query.category!== 'undefined') {
+            category = parseInt(request.query.category as string);
+        }
+        const products = await model.index(category);
+
         return response.status(200).send(products);
-    })
-    .catch(error => {
+    } catch(error) {
         return response.status(400).send(`Could not get books. Error: ${(error as Error).message}`);
-    })
+    }
 });
 
-/*
-* /product/show?id=<product id>
-*
-* @param {number} id:
-* @return {json array} list of products
-*        [ id :{
-*                  product_name: <{string} product name>,
-*                  price: <{number} >
-*              },
-*           ...]
-*/
-product.get('/show/:id', (request, response) => {
+product.get('/show/:id', async (request, response) => {
     const id = parseInt(request.params.id);
-    model.show(id)
-    .then(product => {
-        return response.status(200).send(product);
-    })
-    .catch(error => {
-        return response.status(400).send(`Could not get books. Error: ${(error as Error).message}`);
-    });
+    try {
+        const p = await model.show(id);
+
+        return response.status(200).send(p);
+    } catch(error) {
+        return response.status(400).send(`Could not get a user. Error: ${(error as Error).message}`);
+    }
 });
 
-/*
-* /product/create
-*
-* @param {Product} : Pass the product in the reuqest body.
-* @return {json array} list of products
-*        [ id :{
-*                  product_name: <{string} product name>,
-*                  price: <{number} >
-*              },
-*           ...]
-*/
 product.post('/create', verifyAuthToken, async (request, response) => {
     const p = request.body as Product;
     console.log(p);

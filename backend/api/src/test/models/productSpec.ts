@@ -58,7 +58,7 @@ describe("Product Model", () => {
     });
 
     it('index method should return a list of products', async () => {
-        const result = await model.index();
+        const result = await model.index(-1);
         expect(result.length).toEqual(2);
     });
 
@@ -90,7 +90,7 @@ describe("Product Model", () => {
     it('delete method should remove the product', async () => {
         await model.delete(product1.id);
         await model.delete(product2.id);
-        const result = await model.index()
+        const result = await model.index(-1)
 
         expect(result).toEqual([]);
     });

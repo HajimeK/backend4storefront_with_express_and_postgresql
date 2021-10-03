@@ -102,9 +102,9 @@ describe('Test Suite for /product', () => {
             });
     });
 
-    it('/product/index?category=2', async () => {
+    it(`/product/index?category=1`, async () => {
         await req
-            .get('/product/index?category=2')
+            .get(`/product/index?category=${category2.id}`)
             .expect(200)
             .expect((response) => {
                 const products = response.body as Product[];

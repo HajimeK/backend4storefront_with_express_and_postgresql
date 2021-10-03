@@ -1,84 +1,4 @@
-# About
-
-## About this project
-
-- [About](#about)
-  - [About this project](#about-this-project)
-  - [How to launch the application](#how-to-launch-the-application)
-    - [pre-requisite](#pre-requisite)
-    - [Launch](#launch)
-  - [Test the application](#test-the-application)
-    - [Set up](#set-up)
-  - [Design](#design)
-  - [Database](#database)
-    - [Initialize PostgreSQL](#initialize-postgresql)
-  - [Endpoints and table design](#endpoints-and-table-design)
-    - [Utility Tables](#utility-tables)
-      - [Product Catetory](#product-catetory)
-        - [Data Shapes](#data-shapes)
-        - [Create Table](#create-table)
-        - [Initial data for testing](#initial-data-for-testing)
-        - [API Endpoint](#api-endpoint)
-        - [DB query](#db-query)
-      - [Order Status](#order-status)
-        - [Data Shapes](#data-shapes-1)
-        - [Create Table](#create-table-1)
-        - [Initial data for testing](#initial-data-for-testing-1)
-    - [APIs for Products](#apis-for-products)
-      - [Data Shapes](#data-shapes-2)
-        - [Fields](#fields)
-        - [Create table](#create-table-2)
-        - [Initial data for testing](#initial-data-for-testing-2)
-      - [API Endoints](#api-endoints)
-        - [Index](#index)
-          - [API](#api)
-          - [DB query](#db-query-1)
-          - [Improvements](#improvements)
-        - [Show](#show)
-          - [API](#api-1)
-          - [DB query](#db-query-2)
-        - [Create [token required]](#create-token-required)
-    - [APIs for Users](#apis-for-users)
-      - [Data Shapes](#data-shapes-3)
-        - [Fields](#fields-1)
-        - [Create table](#create-table-3)
-        - [Initial data for testing](#initial-data-for-testing-3)
-      - [API Endoints](#api-endoints-1)
-        - [Index [token required]](#index-token-required)
-          - [API](#api-2)
-          - [DB query](#db-query-3)
-        - [Show [token required]](#show-token-required)
-          - [API](#api-3)
-          - [DB query](#db-query-4)
-        - [Create N[token required]](#create-ntoken-required)
-          - [API](#api-4)
-          - [DB query](#db-query-5)
-    - [APIs for Orders](#apis-for-orders)
-      - [Data Shapes](#data-shapes-4)
-        - [Fields](#fields-2)
-        - [Create table](#create-table-4)
-        - [Initial data for testing](#initial-data-for-testing-4)
-      - [API Endoints](#api-endoints-2)
-        - [Current Order by user (args: user id)[token required]](#current-order-by-user-args-user-idtoken-required)
-          - [API](#api-5)
-          - [DB query](#db-query-6)
-        - [[OPTIONAL] Completed Orders by user (args: user id)[token required]](#optional-completed-orders-by-user-args-user-idtoken-required)
-          - [API](#api-6)
-          - [DB query](#db-query-7)
-
-## How to launch the application
-
-### pre-requisite
-
-You need Docker and Docker-Composer to launch the application.
-
-### Launch
-
-Execute the following command to launch the application.
-
-```
-docker-composer up -d
-```
+# README
 
 **CAUTION**
 
@@ -88,58 +8,241 @@ and the passowrds are also included in the *.env* file.
 When you develop application which provides the service opent to the internet,
 do not forget to *.env* to add to *.gitignore* so that the user IDs and passords are not open in the *git* repository.
 
+Also if you provide the service external to the internet, configure firewall to prevent access except your middleware.
+Only provide the port application provides (Here port number 3000 is provided).
+
+## About this project
+
+This is the project to provide **node.js + express + typescript** which connects to backend DB.
+
+
+- [README](#readme)
+  - [About this project](#about-this-project)
+  - [How to launch the application](#how-to-launch-the-application)
+    - [pre-requisite](#pre-requisite)
+    - [PostgresSQL server](#postgressql-server)
+    - [clean up the environment](#clean-up-the-environment)
+  - [Test the application](#test-the-application)
+    - [Set up](#set-up)
+    - [Initialize DB tables](#initialize-db-tables)
+    - [Launch](#launch)
+  - [Design](#design)
+  - [Database Server](#database-server)
+  - [Endpoints and table design](#endpoints-and-table-design)
+    - [Product Catetory](#product-catetory)
+      - [Data Shapes](#data-shapes)
+      - [Create Table](#create-table)
+      - [Model Layer](#model-layer)
+    - [Order Status](#order-status)
+      - [Data Shapes](#data-shapes-1)
+      - [Create Table](#create-table-1)
+      - [Model Layer](#model-layer-1)
+    - [Products](#products)
+      - [Endpoints](#endpoints)
+      - [Data Shapes](#data-shapes-2)
+        - [Fields](#fields)
+      - [Create table](#create-table-2)
+      - [Model Layer](#model-layer-2)
+      - [API Endoints](#api-endoints)
+        - [[OPTIONAL] Products by category (args: product category)](#optional-products-by-category-args-product-category)
+        - [get list od products](#get-list-od-products)
+        - [[OPTIONAL] Products by category (args: product category)](#optional-products-by-category-args-product-category-1)
+        - [show](#show)
+        - [create [token required]](#create-token-required)
+        - [List of including others](#list-of-including-others)
+      - [Improvements](#improvements)
+    - [Users](#users)
+      - [Data Shapes](#data-shapes-3)
+      - [Create table](#create-table-3)
+      - [Model Layer](#model-layer-3)
+      - [API Endoints](#api-endoints-1)
+        - [Index [token required]](#index-token-required)
+        - [Show [token required]](#show-token-required)
+        - [Create N[token required]](#create-ntoken-required)
+        - [Lis of others](#lis-of-others)
+    - [Orders](#orders)
+      - [Data Shapes](#data-shapes-4)
+      - [Create table](#create-table-4)
+      - [Model Layer](#model-layer-4)
+      - [API Endoints](#api-endoints-2)
+        - [Current Order by user (args: user id)[token required]](#current-order-by-user-args-user-idtoken-required)
+        - [[OPTIONAL] Completed Orders by user (args: user id)[token required]](#optional-completed-orders-by-user-args-user-idtoken-required)
+        - [List of Others](#list-of-others)
+
+## How to launch the application
+
+### pre-requisite
+
+You need Docker and Docker-Composer to launch the application.
+
+### PostgresSQL server
+
+As the middleware needs in the backend PostgreSQL server,
+please run the followign command to launch the PostgreSQL server.
+
+```
+docker-compose up -d
+```
+
+This will launch the PostgreSQL server and Admin tools as docker containers each.
+
+After you run your test, run below to shutdown the docker components.
+
+```
+docker-compose down
+```
+
+### clean up the environment
+
+```
+docker rmi $(sudo docker images -q) -f
+docker volume prune
+
+```
+
 ## Test the application
 
 ### Set up
 
 ```
 cd api/backend
-npm i -g db-migrate
-sudo npm i -g db-migrate
-npm i db-migrate db-migrate-pg
-db-migrate create backend4storefront --sql-file
+npm install
+
+```
+
+### Initialize DB tables
+
+### Launch
+
+```
+npm run dev
+```
+
+
+Then you should find the following output. You can also refer to the test calls for the usage of the APIs.
+
+```
+
+Jasmine started
+starting app on: 0.0.0.0:3000
+
+  Test Suite for database client
+    ✓ connect to db
+    ✓ release db connection
+
+  Order Item Model
+    ✓ create method should add an order item
+    ✓ index method should return a list of order items for an order
+    ✓ show method should return the correct order
+    ✓ update method should update an order item quantity
+    ✓ delete method should remove the order
+
+  Order Model
+    ✓ create method should add an order
+    ✓ index method should return a list of order
+    ✓ show method should return the correct order
+    ✓ update method should update an order status
+    ✓ update method should update an order item
+    ✓ delete method should remove the order
+
+  Order Status Model
+    ✓ create method should add a Order Status
+    ✓ index method should return a list of product categories
+    ✓ show method should return the correct Order Status
+    ✓ update method should update a Order Status
+    ✓ delete method should remove the Order Status
+
+  Product Category Model
+    ✓ create method should add a Product Category
+    ✓ index method should return a list of product categories
+    ✓ show method should return the correct product category
+    ✓ update method should update a product category
+    ✓ delete method should remove the product category
+
+  Product Model
+    ✓ create method should add a product
+    ✓ create method should add a product (2nd)
+SELECT * FROM product
+    ✓ index method should return a list of products
+SELECT * FROM product WHERE category=5;
+    ✓ index method should return a list of product with category
+    ✓ show method should return the correct product
+    ✓ update method should update a product fields
+SELECT * FROM product
+    ✓ delete method should remove the product
+
+  User Model
+    ✓ create method should add a user
+    ✓ index method should return a list of users
+    ✓ show method should return the correct user
+    ✓ authenticate with correst user/pass to approve login
+    ✓ authenticate with wrong pass to approve login
+    ✓ authenticate with wrong user to approve login
+    ✓ update method should update a product fields
+    ✓ delete method should remove the user
+
+  Test suite for /order
+    ✓ /order/create create method should add an order
+    ✓ /order/index/userid index method should return a list of order for user
+    ✓ /order/index/1?status=2 index method should return a list of order for user with completed
+    ✓ /order/show/0 show method should return the correct order
+    ✓ /order/delete delete method should remove the order
+
+  Test Suite for /product
+    ✓ /product/create create method should add a product (first)
+    ✓ /product/create create method should add a product (2nd)
+    ✓ /product/index
+    ✓ /product/index?category=1
+    ✓ /product/show/2
+    ✓ /product/delete
+
+  Test suite for /user
+    ✓ /user/login
+    ✓ /user/create
+    ✓ /user/index
+    ✓ /user/show/1
+
+  Test Suite for /
+    ✓ Server healthcheck
+
+Executed 54 of 54 specs SUCCESS in 2 secs.
 ```
 
 
 ## Design
 
 
-## Database
+## Database Server
 
-### Initialize PostgreSQL
-
-1. open psql
-2. install encrypt some of the data
-3. create a new database
-4. connect to a database
-5. get out of psql
+For maintenance, you can connect to the DB in command line.
 
 ``` sql
-psql -H <host> -U <user> backend4storefront;
-CREATE EXTENSION PGCRYPTO;
-CREATE DATABASE backend4storefront;
-\c backend4storefront
+psql -h 0.0.0.0 -p 5432 -U root backend4storefront_test;
 \q
+```
+
+Or you can use the admin tools.
+
+```
+http://localhost:3001
 ```
 
 ## Endpoints and table design
 
-### Utility Tables
+### Product Catetory
 
-#### Product Catetory
-
-##### Data Shapes
+#### Data Shapes
 
 ``` ts
-export type Category = {
-     id: number;
-     category: string;
+export interface  ProductCategory {
+    id: number;
+    category: string;
 }
 ```
 
 The model implementation is [here](backend/api/src/models/product_category.ts).
 
-##### Create Table
+#### Create Table
 
 ``` sql
 CREATE TABLE IF NOT EXISTS product_category (
@@ -149,46 +252,29 @@ CREATE TABLE IF NOT EXISTS product_category (
 );
 ```
 
-##### Initial data for testing
+#### Model Layer
 
-``` sql
-INSERT INTO product_category (category) VALUES
-  ('stock'),
-  ('ETF');
-  ('crypto');
+```
+  Product Category Model
+    ✓ create method should add a Product Category
+    ✓ index method should return a list of product categories
+    ✓ show method should return the correct product category
+    ✓ update method should update a product category
+    ✓ delete method should remove the product category
 ```
 
-##### API Endpoint
+### Order Status
+
+#### Data Shapes
 
 ``` ts
-/*
- * /categories
- * @return {json array} list of catetoryies
- *        [ id :{
- *                  category: <{string} category name>
- *              },
- *           ...]
-```
-
-##### DB query
-
-``` sql
-SELECT *
-FROM product_category
-```
-
-#### Order Status
-
-##### Data Shapes
-
-``` ts
-export type OrderStatus = {
+export interface OrderStatus {
     id: number;
-    status: string;
+    order_status: string;
 }
 ```
 
-##### Create Table
+#### Create Table
 
 ``` sql
 CREATE TABLE IF NOT EXISTS order_status (
@@ -198,154 +284,102 @@ CREATE TABLE IF NOT EXISTS order_status (
 );
 ```
 
-##### Initial data for testing
+#### Model Layer
 
-``` sql
-INSERT INTO order_status VALUES
-  ('compoleted'),
-  ('active');
+```
+  Order Status Model
+    ✓ create method should add a Order Status
+    ✓ index method should return a list of product categories
+    ✓ show method should return the correct Order Status
+    ✓ update method should update a Order Status
+    ✓ delete method should remove the Order Status
 ```
 
-### APIs for Products
 
-- Index
-- Show
-- Create [token required]
-- [OPTIONAL] Top 5 most popular products
+### Products
+
+#### Endpoints
+
 - [OPTIONAL] Products by category (args: product category)
-- categories
+- get list od products
+- [OPTIONAL] Products by category (args: product category)
+- show
+- create [token required]
+
 
 #### Data Shapes
 
 ##### Fields
 
 ``` ts
-export type Product = {
-    id: number,
-    name: string,
-    price: number,
-    category?: string
-};
+export interface Product {
+    id: number;
+    product_name: string;
+    price: number;
+    category?: number;
+}
 ```
 
-##### Create table
+#### Create table
 
 ``` sql
 CREATE TABLE IF NOT EXISTS product (
   id SERIAL,
   product_name VARCHAR(128) NOT NULL,
   price INT NOT NULL,
-  CONSTRAINT fk_category_id
-    FOREIGN KEY (category_id)
-    REFERENCES product_category (id)
-    ON DELETE RESTRICT ON UPDATE RESTRICT,
+  category INT,
+    FOREIGN KEY (category)
+    REFERENCES product_category (id),
   PRIMARY KEY (id)
 );
 ```
+#### Model Layer
 
-##### Initial data for testing
-
-``` sql
-INSERT INTO product VALUES
-  ('AMZN', 100, 0),
-  ('GOGL', 100, 0),
-  ('APPL', 100, 0),
-  ('FCBK', 100, 0),
-  ('MSFT', 100, 0),
-  ('USGROWTH', 100, 1),
-  ('Asia', 100, 1),
-  ('SP500', 100, 1),
-  ('bitcoin', 100, 2),
-  ('ethereum', 100, 2);
+```
+  Product Model
+    ✓ create method should add a product
+    ✓ index method should return a list of products
+    ✓ index method should return a list of product with category
+    ✓ show method should return the correct product
+    ✓ update method should update a product fields
+    ✓ delete method should remove the product
 ```
 
 #### API Endoints
 
-##### Index
+##### [OPTIONAL] Products by category (args: product category)
+##### get list od products
 
-- get list od products
-- [OPTIONAL] Top 5 most popular products
-- [OPTIONAL] Products by category (args: product category)
+##### [OPTIONAL] Products by category (args: product category)
 
-###### API
+##### show
 
-``` ts
-/*
- * /products?top=<true | false>&num=<number(default 5)>?category=<catetory>
- *
- * @param {boolean} top: [Optional]true to get top. If not specified
- * @param {number} num: [Optional] Only work with top.The numbe of items to get. Default value is 5.
- * @param {string} category: [Optional] the product category. The category should match that are stored in the category table.
- * @return {json array} list of products
- *        [ id :{
- *                  product_name: <{string} product name>,
- *                  price: <{number} >
- *              },
- *           ...]
+##### create [token required]
+
+##### List of including others
+
+Al the API points including for maintenance are listed below.
+
+```
+  API End poinst for /product
+    ✓ /product/create create method should add a product (first)
+    ✓ /product/create create method should add a product (2nd)
+    ✓ /product/index
+    ✓ /product/index?category=1
+    ✓ /product/show/2
+    ✓ /product/delete
 ```
 
-###### DB query
 
-``` sql
-SELECT product.id, product.product_name, product.price, product_category.category
-FROM product
-LEFT JOIN product_category ON product.category_id = product_category.id;
-```
-
-###### Improvements
+#### Improvements
 
 When the number of products is huge, there will be an issue in perfomance.
 One way to avoid that is to return the data with pagind.
 Need this to be implemented in the future improvement.
 
-##### Show
-
-- show
-
-###### API
-
-``` ts
-/*
- * Take at least one and only one of product id or product name as a parametera and return a single product itme
- * /show?id=<product id>
- * /show?procuct=<product name>
- *
- * @param {number} id: [Optional]
- * @param {string} product: [Optional]
- * @return {json array} list of products
- *        {
- *          id: {number},
- *          product_name: {string},
- *          price: {number},
- *          category: {string}
- *        }
- *        Error () if no parameter is set.
-```
-
-###### DB query
-
-####### Query by product ID
-
-``` sql
-SELECT SINGLE product.id, product.product_name, product.price, product_category.category
-FROM product
-WHERE product.id=<product id>
-LEFT JOIN product_category ON product.category_id = product_category.id;
-```
-
-####### Query by product name
-
-``` sql
-SELECT SINGLE product.id, product.product_name, product.price, product_category.category
-FROM product
-WHERE product.product_name=<product name>
-LEFT JOIN product_category ON product.category_id = product_category.id;
-```
-
-##### Create [token required]
 
 
-### APIs for Users
+### Users
 
 - Index [token required]
 - Show [token required]
@@ -353,180 +387,172 @@ LEFT JOIN product_category ON product.category_id = product_category.id;
 
 #### Data Shapes
 
-##### Fields
-
-export type User = {
-    id: number,
+```ts
+export interface User {
+    id: number;
     email: string;
-    firstName: string,
-    lastName: string,
-    password: string
-};
+    firstname: string,
+    lastname: string;
+    userpassword: string;
+}
+```
 
-##### Create table
+#### Create table
 
 ``` sql
-CREATE TABLE IF NOT EXISTS user (
+CREATE TABLE IF NOT EXISTS appuser (
   id SERIAL,
   email VARCHAR NOT NULL,
-  firstName VARCHAR NOT NULL,
-  lastName VARCHAR NOT NULL,
+  firstname VARCHAR NOT NULL,
+  lastname VARCHAR NOT NULL,
   userpassword VARCHAR NOT NULL,
   PRIMARY KEY (id)
 );
 ```
 
-##### Initial data for testing
+#### Model Layer
 
-``` sql
-INSERT INTO backend4storefront.user (item, description, level) VALUES
-    (
-        pgp_sym_encrypt('first', 'my_pass'),
-        pgp_sym_encrypt('last', 'my_pass'),
-        pgp_sym_encrypt('password', 'my_pass')
-    );
+```
+  User Model
+    ✓ create method should add a user
+    ✓ index method should return a list of users
+    ✓ show method should return the correct user
+    ✓ authenticate with correst user/pass to approve login
+    ✓ authenticate with wrong pass to approve login
+    ✓ authenticate with wrong user to approve login
+    ✓ update method should update a product fields
+    ✓ delete method should remove the user
 ```
 
 #### API Endoints
 
+You can access the following endpoinst under */product*.
 
 ##### Index [token required]
 
-###### API
-
 ``` ts
-/*
- */
-```
-
-###### DB query
-
-``` sql
-SELECT id, pgp_sym_decrypt(firstname, 'my_pass'),  pgp_sym_decrypt(lastname, 'my_pass'),
-FROM member;
+user.get('/index', verifyAuthToken, async (request, response) => {
 ```
 
 ##### Show [token required]
 
-###### API
-
 ``` ts
-/*
- */
-```
-
-###### DB query
-
-``` sql
-SELECT id, pgp_sym_decrypt(firstname, 'my_pass'), pgp_sym_decrypt(lastname, 'my_pass'),  pgp_sym_decrypt(password, 'my_pass')
-FROM member;
-WHERE firstname=pgp_sym_encrypt('first', 'my_pass') AND lastname=gp_sym_encrypt('last', 'my_pass')
+user.get('/show/:id', verifyAuthToken, async (request, response) => {
 ```
 
 ##### Create N[token required]
 
-###### API
 
 ``` ts
-/*
- */
+user.post('/create', verifyAuthToken, async (request, response) => {
 ```
 
-###### DB query
+##### Lis of others
 
-``` sql
-INSERT INTO user VALUES
-  ( pgp_sym_encrypt('first', 'my_pass'),
-    pgp_sym_encrypt('last', 'my_pass'),
-    pgp_sym_encrypt('password', 'my_pass'));
+Al the API points including for maintenance are listed below.
+
+```
+  Test suite for /user
+    ✓ /user/login
+    ✓ /user/create
+    ✓ /user/index
+    ✓ /user/show/1
 ```
 
-### APIs for Orders
+### Orders
 
 - Current Order by user (args: user id)[token required]
 - [OPTIONAL] Completed Orders by user (args: user id)[token required]
 
 #### Data Shapes
 
-##### Fields
+```ts
+export interface Order {
+    id: number;
+    appuser: number;
+    order_status: number;
+}
 
-
-``` ts
-export type Order = {
-    id: number,
-    user_id: number,
-    order_status_id: number,
-    item: OrderItem[]
-};
-
-export type OrderItem = {
-    id: number,
-    product_id: number,
-    quantity: number,
-};
+export interface OrderItem {
+    id: number;
+    apporder: number;
+    product: number;
+    quantity: number;
+}
 ```
-##### Create table
+
+#### Create table
 
 ``` sql
-CREATE TABLE IF NOT EXISTS order (
+CREATE TABLE IF NOT EXISTS apporder (
     id SERIAL,
-    CONSTRAINT fk_user_id
-        FOREIGN KEY (user_id)
-        REFERENCES user (id)
-        ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT fk_order_status_id
-        FOREIGN KEY (order_status_id)
+    appuser INT,
+        FOREIGN KEY (appuser)
+        REFERENCES appuser (id),
+    order_status INT,
+        FOREIGN KEY (order_status)
         REFERENCES order_status (id)
         ON DELETE RESTRICT ON UPDATE RESTRICT,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS order_item (
+CREATE TABLE IF NOT EXISTS apporder_item (
     id SERIAL,
-    CONSTRAINT fk_order_id
-        FOREIGN KEY (order_id)
-        REFERENCES order (id)
-        ON DELETE RESTRICT ON UPDATE RESTRICT,
-    CONSTRAINT fk_product_id
-        FOREIGN KEY (product_id)
-        REFERENCES product (id)
-        ON DELETE RESTRICT ON UPDATE RESTRICT,
+    apporder INT,
+        FOREIGN KEY (apporder)
+        REFERENCES apporder (id),
+    product INT,
+        FOREIGN KEY (product)
+        REFERENCES product (id),
     quantity INT,
     PRIMARY KEY (id)
-)
+);
 ```
 
-##### Initial data for testing
+#### Model Layer
 
-``` sql
+```
+  Order Item Model
+    ✓ create method should add an order item
+    ✓ index method should return a list of order items for an order
+    ✓ show method should return the correct order
+    ✓ update method should update an order item quantity
+    ✓ delete method should remove the order
+
+  Order Model
+    ✓ create method should add an order
+    ✓ index method should return a list of order
+    ✓ show method should return the correct order
+    ✓ update method should update an order status
+    ✓ update method should update an order item
+    ✓ delete method should remove the order
 ```
 
 #### API Endoints
 
+You can access the following endpoinst under */order*.
+
 ##### Current Order by user (args: user id)[token required]
 
-###### API
-
 ``` ts
-/*
- */
-```
-
-###### DB query
-
-``` sql
+order.get('/index/:user', verifyAuthToken, (request: Request, response: Response) => {
+order.get('/show/:id', (request: Request, response: Response) => {
 ```
 
 ##### [OPTIONAL] Completed Orders by user (args: user id)[token required]
 
-###### API
-
 ``` ts
-/*
- */
+order.get('/index/:user?status=<status id>', verifyAuthToken, (request: Request, response: Response) => {
 ```
 
-###### DB query
+##### List of Others
 
-``` sql
+Al the API points including for maintenance are listed below.
+```
+  /order
+    ✓ /order/create create method should add an order
+    ✓ /order/index/userid index method should return a list of order for user
+    ✓ /order/index/1?status=2 index method should return a list of order for user with completed
+    ✓ /order/show/0 show method should return the correct order
+    ✓ /order/delete delete method should remove the order
 ```
