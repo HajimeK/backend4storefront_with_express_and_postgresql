@@ -22,10 +22,13 @@ This is the project to provide **node.js + express + typescript** which connects
     - [pre-requisite](#pre-requisite)
     - [Repository](#repository)
     - [PostgresSQL server](#postgressql-server)
-    - [clean up the environment](#clean-up-the-environment)
+      - [Launch PostgreSQL Locally](#launch-postgresql-locally)
+      - [Launch PostgreSQL server.](#launch-postgresql-server)
+      - [Launch PostgreSQL with docker-compose](#launch-postgresql-with-docker-compose)
+      - [clean up the environment](#clean-up-the-environment)
   - [Test the application](#test-the-application)
     - [Install the npm package dependencies.](#install-the-npm-package-dependencies)
-    - [Launch the middle ware](#launch-the-middle-ware)
+    - [Launch the middleware](#launch-the-middleware)
     - [Launch](#launch)
       - [Database Server](#database-server)
     - [Run Jasmine unit tests with the middleware functions](#run-jasmine-unit-tests-with-the-middleware-functions)
@@ -50,29 +53,61 @@ cd ./backend4storefront_with_express_and_postgresql
 
 ### PostgresSQL server
 
+#### Launch PostgreSQL Locally
+
+#### Launch PostgreSQL server.
+
 As the middleware needs in the backend PostgreSQL server,
 run the followign command to launch the PostgreSQL server.
 
+
+```sh
+sudo apt update
+sudo apt install postgresql
+sudo apt install postgresql-contrib
+sudo -i -u postgres
+postgres@ubuntu:~$ psql
+psql (12.8 (Ubuntu 12.8-0ubuntu0.20.04.1))
+Type "help" for help.
+
+postgres=# CREATE USER storefront WITH PASSWORD 'pass';
+CREATE ROLE
+postgres=# CREATE DATABASE backend4storefront_test;
+CREATE DATABASE
+postgres=# CREATE DATABASE backend4storefront;
+CREATE DATABASE
+postgres=# GRANT ALL PRIVILEGES ON DATABASE backend4storefront TO storefront;
+GRANT
+postgres=# GRANT ALL PRIVILEGES ON DATABASE backend4storefront_test TO storefront;
+GRANT
 ```
+
+#### Launch PostgreSQL with docker-compose
+
+Run the followign command to launch the PostgreSQL server.
+In this code example, db user is assumed "root".
+Please update *user* in *backend/api/database.json* and *POSTGRES_USER* in the *.env* values to *root* accordingl.
+
+```sh
 docker-compose up -d
 ```
 
 This will launch the PostgreSQL server and PostgreSQL Admin tools as docker containers each.
 
 
-### clean up the environment
+#### clean up the environment
 
 After you run your test, run below to shutdown the docker components.
 
-```
+```sh
 docker-compose down
 ```
 
-```
+```sh
 docker rmi $(sudo docker images -q) -f
 docker volume prune
-
 ```
+
 
 ## Test the application
 
@@ -81,10 +116,9 @@ docker volume prune
 ```
 cd api/backend
 npm install
-
 ```
 
-### Launch the middle ware
+### Launch the middleware
 
 Not needed first time, but you can safely lauch the middleware by cleaning up the database with the following command.
 
@@ -121,9 +155,16 @@ You can connect to the DB in command line to connect to the database server (hos
 psql -h 0.0.0.0 -p 5432 -U root backend4storefront_test;
 \q
 ```
+
 You will be prompted a *root* user password. Please use *pass*, for testing puporse.
 
 Or you can use the admin tools running as a docker container.
+
+In the case you launched the PostgreSQL server without docker-compose instead,
+
+```csh
+psql -h 0.0.0.0 -p 5432 -U storefront backend4storefront_test
+```
 
 ```
 http://localhost:3001
@@ -135,6 +176,7 @@ For both, to access database server, user *root* and password *pass* can be user
 ### Run Jasmine unit tests with the middleware functions
 
 Ren bdelow to test the feasures defined in the [REQUIREMENTS.md](./REQUIREMENTS.md).
+
 ```
 npm run test
 ```
