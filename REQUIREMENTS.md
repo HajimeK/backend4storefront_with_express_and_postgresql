@@ -1,5 +1,49 @@
 # REQUIREMENT
 
+- [REQUIREMENT](#requirement)
+  - [API Requirements](#api-requirements)
+  - [Design](#design)
+  - [Endpoints and table design](#endpoints-and-table-design)
+    - [Product Catetory](#product-catetory)
+      - [Data Shapes](#data-shapes)
+      - [Create Table](#create-table)
+      - [Model Layer](#model-layer)
+    - [Order Status](#order-status)
+      - [Data Shapes](#data-shapes-1)
+      - [Create Table](#create-table-1)
+      - [Model Layer](#model-layer-1)
+    - [Products](#products)
+      - [Endpoints](#endpoints)
+      - [Data Shapes](#data-shapes-2)
+        - [Fields](#fields)
+      - [Create table](#create-table-2)
+      - [Model Layer](#model-layer-2)
+      - [API Endoints](#api-endoints)
+        - [get list od products](#get-list-od-products)
+        - [[OPTIONAL] Products by category (args: product category)](#optional-products-by-category-args-product-category)
+        - [show](#show)
+        - [create [token required]](#create-token-required)
+        - [delete](#delete)
+      - [Improvements [OPTIONAL]](#improvements-optional)
+    - [Users](#users)
+      - [Data Shapes](#data-shapes-3)
+      - [Create table](#create-table-3)
+      - [Model Layer](#model-layer-3)
+      - [API Endoints](#api-endoints-1)
+        - [login](#login)
+        - [Index [token required]](#index-token-required)
+        - [Show [token required]](#show-token-required)
+        - [Create [token required]](#create-token-required-1)
+        - [Delete [token required]](#delete-token-required)
+    - [Orders](#orders)
+      - [Data Shapes](#data-shapes-4)
+      - [Create table](#create-table-4)
+      - [Model Layer](#model-layer-4)
+      - [API Endoints](#api-endoints-2)
+        - [Current Order by user (args: user id)[token required]](#current-order-by-user-args-user-idtoken-required)
+        - [Create and order](#create-and-order)
+        - [Show an order](#show-an-order)
+        - [Delete an order](#delete-an-order)
 ## API Requirements
 The company stakeholders want to create an online storefront to showcase their great product ideas. Users need to be able to browse an index of all products, see the specifics of a single product, and add products to an order that they can view in a cart page. You have been tasked with building the API that will support this application, and your coworker is building the frontend.
 
@@ -90,10 +134,11 @@ Requirement to the products that can be added to the order as orde items.
 
 #### Endpoints
 
-- get list od products
+- get list of products
 - show
 - create [token required]
 - [OPTIONAL] Products by category (args: product category)
+- delete product by ID
 
 #### Data Shapes
 
@@ -140,25 +185,25 @@ Following CRUD features provided in the model layer.
 ##### get list od products
 
 ```
-    ✓ /product/index
+    ✓ [GET] /product/index
 ```
 
 ##### [OPTIONAL] Products by category (args: product category)
 
 ```
-    ✓ /product/index?category=<category_id>
+    ✓ [GET] /product/index?category=<category_id>
 ```
 
 ##### show
 
 ```
-    ✓ /product/show/<product_id>
+    ✓ [GET] /product/show/<product_id>
 ```
 
 ##### create [token required]
 
 ```
-    ✓ /product/create
+    ✓ [POST] /product/create
 ```
 
 Send data defined in the Fields.
@@ -166,7 +211,7 @@ Send data defined in the Fields.
 ##### delete
 
 ```
-    ✓ /product/delete
+    ✓ [DELETE] /product/<produc id>
 ```
 
 #### Improvements [OPTIONAL]
@@ -179,7 +224,8 @@ Need this to be implemented in the future improvement.
 
 - Index [token required]
 - Show [token required]
-- Create N[token required]
+- Create [token required]
+- Delete [token required]
 
 #### Data Shapes
 
@@ -254,30 +300,36 @@ In the response body, you get below. Extract the token from below and set as *Au
 
 Get a list of users.
 ```
-    ✓ /user/index
+    ✓ [GET] /user/index
 ```
 
 ##### Show [token required]
 
 ```
-    ✓ /user/show/<user id>
+    ✓ [GET] /user/show/<user id>
 ```
 
 ##### Create [token required]
 
-
-``` 
-    ✓ /create
+```
+    ✓ [POST] /user/create
 ```
 
+Set the following in the request body.
 ```
 {
     id: number;
     email: string;
-    firstname: string,
+    firstname: string;
     lastname: string;
     userpassword: string;
 }
+```
+
+##### Delete [token required]
+
+```
+    ✓ [DELETE] /user/<user id>
 ```
 
 ### Orders
